@@ -1,5 +1,6 @@
 import { MapPin, Shield, Utensils } from "lucide-react";
 import thailandBackground from "../../imports/thailand-background.png";
+import philippinesBackground from "../../imports/philippines-background.png";
 import { homeDestinationsComingSoonBackgrounds } from "../comingSoonBackgrounds";
 
 export function Destinations() {
@@ -19,19 +20,19 @@ export function Destinations() {
     },
     {
       country: "Philippines",
-      cities: ["Manila", "Cebu", "Boracay"],
-      image: homeDestinationsComingSoonBackgrounds.philippines,
+      cities: ["Boracay", "Siargao", "Palawan"],
+      image: philippinesBackground,
       description:
-        "Discover tropical paradise with world-famous hospitality and incredible value for luxury experiences.",
+        "Discover tropical paradise with world-famous hospitality, pristine beaches, and incredible luxury experiences.",
       highlights: [
-        "BGC (Bonifacio Global City) upscale lifestyle hub",
-        "White sand beaches and water sports",
-        "Top-tier resorts at competitive prices",
-        "English-speaking friendly environment",
+        "White sand beaches and luxury beachfront resorts in Boracay",
+        "World-class surfing and island hopping in Siargao",
+        "Breathtaking lagoons and private islands in Palawan",
+        "English-speaking friendly environment and warm hospitality",
       ],
     },
     {
-      country: "Colombia",
+      country: "Colombia (Coming Soon)",
       cities: ["Medellín", "Cartagena", "Bogotá"],
       image: homeDestinationsComingSoonBackgrounds.colombia,
       description:
@@ -44,7 +45,7 @@ export function Destinations() {
       ],
     },
     {
-      country: "Brazil",
+      country: "Brazil (Coming Soon)",
       cities: ["Rio de Janeiro", "São Paulo", "Florianópolis"],
       image: homeDestinationsComingSoonBackgrounds.brazil,
       description:

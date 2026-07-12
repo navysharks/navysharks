@@ -236,23 +236,26 @@ export function Partners() {
                   <div className="relative h-56 overflow-hidden">
                     <img
                       src={partner.image}
-                      alt={partner.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      alt="Premium Partner"
+                      className="w-full h-full object-cover blur-md grayscale group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
+                    <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                      <Lock className="w-12 h-12 text-slate-300 drop-shadow-xl" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent pointer-events-none"></div>
                     <div className="absolute top-3 right-3 px-3 py-1 bg-cyan-500 text-white text-xs font-bold rounded-full">
                       {partner.country}
                     </div>
                   </div>
 
                   <div className="p-5">
-                    <h3 className="text-xl font-bold mb-2">{partner.name}</h3>
+                    <h3 className="text-xl font-bold mb-2">Premium Partner</h3>
                     <p className="text-slate-400 text-sm mb-3">
-                      {partner.location}
+                      Location hidden (Members Only)
                     </p>
                     <div className="bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 px-3 py-2 rounded-lg">
                       <p className="text-cyan-400 text-sm font-semibold">
-                        {partner.discount}
+                        Members-Only Discount
                       </p>
                     </div>
                   </div>

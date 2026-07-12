@@ -275,6 +275,15 @@ export function Contact() {
 
               <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
                 <h3 className="font-semibold text-lg mb-2">
+                  How many days until you get the physical ID?
+                </h3>
+                <p className="text-slate-300">
+                  Physical RFID cards are shipped within 3-5 business days. You can use your digital code immediately while waiting.
+                </p>
+              </div>
+
+              <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h3 className="font-semibold text-lg mb-2">
                   Can I schedule a call before joining?
                 </h3>
                 <p className="text-slate-300">

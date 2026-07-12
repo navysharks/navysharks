@@ -18,6 +18,9 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { experiencesComingSoonBackgrounds } from "../comingSoonBackgrounds";
+import { BookingCalendarModal } from "../components/BookingCalendarModal";
+import { CheckoutModal } from "../components/CheckoutModal";
+import { EliteMembershipModal } from "../components/EliteMembershipModal";
 
 export function Membership() {
   const [showRFID, setShowRFID] = useState(false);
@@ -29,6 +32,36 @@ export function Membership() {
   const [customSelections, setCustomSelections] = useState<
     Record<string, string>
   >({});
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [selectedBundleForCalendar, setSelectedBundleForCalendar] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
+
+  const handleEliteCheckoutComplete = () => {
+    setIsEliteModalOpen(false);
+    toast.success("Redirecting to Stripe...", {
+      description: "You are being securely redirected to Stripe Checkout for Elite Membership.",
+    });
+  };
+
+  const handleOpenCalendar = (bundleName: string) => {
+    setSelectedBundleForCalendar(bundleName);
+    setIsCalendarOpen(true);
+  };
+
+  const handleCalendarConfirm = (date: Date) => {
+    setSelectedDate(date);
+    setIsCalendarOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleCheckoutComplete = () => {
+    setIsCheckoutOpen(false);
+    toast.success("Redirecting to Stripe...", {
+      description: "You are being securely redirected to Stripe Checkout.",
+    });
+  };
 
   const generateRFID = async () => {
     setIsGenerating(true);
@@ -95,10 +128,10 @@ export function Membership() {
           nights: "3 Nights",
           description: "Perfect for elevated weekend escapes",
           includes: [
-            "3-night 5-star hotel stay",
-            "2 VIP rooftop nightclub table reservations",
-            "Bottle service credit included",
-            "River club day pass",
+            "3-night luxury hotel stay",
+            "$100 curated dining credit",
+            "$100 transport credit",
+            "Security credit",
             "Private airport transfers",
             "Dedicated concierge support",
           ],
@@ -114,16 +147,17 @@ export function Membership() {
             "4-night riverfront 5-star stay",
             "Daily breakfast included",
             "$200 curated dining credit",
-            "VIP rooftop nightclub access (1 evening)",
+            "VIP nightclub access +1 entry",
+            "$100 transport credit",
+            "Security credit",
             "Private airport transfers",
-            "Priority spa booking",
             "24/7 concierge WhatsApp support",
           ],
           value: "$1,950",
           popular: true,
         },
         {
-          name: "River & Rooftop Elite",
+          name: "Yacht & River Elite",
           price: "$1,650",
           nights: "3 Nights",
           description:
@@ -131,9 +165,9 @@ export function Membership() {
           includes: [
             "3-night premium riverfront hotel stay",
             "Half-day private river yacht (up to 8 guests)",
-            "Champagne & onboard host",
-            "Exclusive rooftop nightclub access",
-            "Professional photography session",
+            "Complimentary bottle (exclusive requested bottle is subject to approval)",
+            "$100 transport credit",
+            "Security credit",
             "Private transfers",
             "Concierge planning service",
           ],
@@ -149,10 +183,10 @@ export function Membership() {
           description:
             "Perfect for elevated beach weekend escapes",
           includes: [
-            "3-night beachfront 5-star hotel stay",
-            "2 VIP nightclub table reservations",
-            "Bottle service credit included",
-            "Beach club day pass",
+            "3-night luxury hotel stay",
+            "$100 curated dining credit",
+            "$100 transport credit",
+            "Security credit",
             "Private airport transfers",
             "Dedicated concierge support",
           ],
@@ -165,12 +199,13 @@ export function Membership() {
           nights: "4 Nights",
           description: "The complete Pattaya beach experience",
           includes: [
-            "4-night beachfront 5-star stay",
+            "4-night sea view stay",
             "Daily breakfast included",
             "$200 curated dining credit",
-            "VIP nightclub access (1 evening)",
+            "VIP nightclub access +1 entry",
+            "$100 transport credit",
+            "Security credit",
             "Private airport transfers",
-            "Priority spa booking",
             "24/7 concierge WhatsApp support",
           ],
           value: "$1,950",
@@ -183,11 +218,11 @@ export function Membership() {
           description:
             "Private island hopping with yacht experience",
           includes: [
-            "3-night premium beachfront hotel stay",
+            "3-night beachfront hotel stay",
             "Half-day private yacht island tour (up to 8 guests)",
-            "Champagne & onboard host",
-            "Exclusive island beach club access",
-            "Professional photography session",
+            "Complimentary bottle (exclusive requested bottle is subject to approval)",
+            "$100 transport credit",
+            "Security credit",
             "Private transfers",
             "Concierge planning service",
           ],
@@ -203,10 +238,10 @@ export function Membership() {
           description:
             "Perfect for elevated island weekend escapes",
           includes: [
-            "3-night beachfront 5-star hotel stay",
-            "2 VIP nightclub table reservations",
-            "Bottle service credit included",
-            "Beach club day pass",
+            "3-night luxury hotel stay",
+            "$100 curated dining credit",
+            "$100 transport credit",
+            "Security credit",
             "Private airport transfers",
             "Dedicated concierge support",
           ],
@@ -219,12 +254,13 @@ export function Membership() {
           nights: "4 Nights",
           description: "The complete Phuket island experience",
           includes: [
-            "4-night beachfront 5-star stay",
+            "4-night sea view stay",
             "Daily breakfast included",
             "$200 curated dining credit",
-            "VIP nightclub access (1 evening)",
+            "VIP nightclub access +1 entry",
+            "$100 transport credit",
+            "Security credit",
             "Private airport transfers",
-            "Priority spa booking",
             "24/7 concierge WhatsApp support",
           ],
           value: "$1,950",
@@ -237,11 +273,11 @@ export function Membership() {
           description:
             "Private island hopping with yacht experience",
           includes: [
-            "3-night premium beachfront hotel stay",
+            "3-night beachfront hotel stay",
             "Half-day private yacht island hopping (up to 8 guests)",
-            "Champagne & onboard host",
-            "Exclusive island beach club access",
-            "Professional photography session",
+            "Complimentary bottle (exclusive requested bottle is subject to approval)",
+            "$100 transport credit",
+            "Security credit",
             "Private transfers",
             "Concierge planning service",
           ],
@@ -252,59 +288,165 @@ export function Membership() {
     },
     philippines: {
       name: "Philippines",
-      location: "Manila • Cebu • Boracay",
-      comingSoon: true,
-      comingSoonImage:
-        experiencesComingSoonBackgrounds.philippines,
-      bundles: [
+      location: "Boracay • Siargao • Palawan",
+      comingSoon: false,
+      comingSoonImage: "",
+      boracayBundles: [
         {
-          name: "Island Weekend Escape",
-          price: "$850",
+          name: "VIP Weekend Access",
+          price: "$980",
           nights: "3 Nights",
-          description: "Tropical paradise entry experience",
+          description: "Perfect for elevated island escapes",
           includes: [
-            "3-night beachfront resort stay",
-            "Island hopping tour included",
-            "Beach club access",
-            "Welcome drinks & dining credit",
-            "Private transfers",
-            "Concierge support",
+            "3-night luxury hotel stay",
+            "$100 curated dining credit",
+            "$100 transport credit",
+            "Security credit",
+            "Private airport transfers",
+            "Dedicated concierge support",
           ],
-          value: "$1,300",
+          value: "$1,450",
           popular: false,
         },
         {
-          name: "Manila Luxe Experience",
-          price: "$1,180",
+          name: "Luxe Escape Experience",
+          price: "$1,290",
           nights: "4 Nights",
-          description: "Urban luxury meets island paradise",
+          description: "The complete island luxury experience",
           includes: [
-            "4-night premium BGC hotel",
-            "$250 curated dining credit",
-            "2 VIP nightclub reservations",
-            "Day trip to hidden beach",
-            "Rooftop bar access",
-            "Private car service",
-            "24/7 concierge support",
+            "4-night sea view stay",
+            "Daily breakfast included",
+            "$200 curated dining credit",
+            "VIP nightclub access +1 entry",
+            "$100 transport credit",
+            "Security credit",
+            "Private airport transfers",
+            "24/7 concierge WhatsApp support",
           ],
-          value: "$1,850",
+          value: "$1,950",
           popular: true,
         },
         {
-          name: "Yacht & Beach Club Elite",
-          price: "$1,450",
+          name: "Yacht & Island Elite",
+          price: "$1,650",
           nights: "3 Nights",
-          description: "Private yacht & exclusive beach access",
+          description: "Premium island hopping experience",
           includes: [
-            "3-night luxury resort",
-            "Private yacht charter (6-8 guests)",
-            "Beach club VIP cabana",
-            "Sunset dinner cruise",
-            "Water sports package",
-            "Professional photos",
-            "Full concierge service",
+            "3-night beachfront hotel stay",
+            "Half-day private yacht/boat tour",
+            "Complimentary bottle (exclusive requested bottle is subject to approval)",
+            "$100 transport credit",
+            "Security credit",
+            "Private transfers",
+            "Concierge planning service",
           ],
-          value: "$2,300",
+          value: "$2,500",
+          popular: false,
+        },
+      ],
+      siargaoBundles: [
+        {
+          name: "VIP Weekend Access",
+          price: "$980",
+          nights: "3 Nights",
+          description: "Perfect for elevated island escapes",
+          includes: [
+            "3-night luxury hotel stay",
+            "$100 curated dining credit",
+            "$100 transport credit",
+            "Security credit",
+            "Private airport transfers",
+            "Dedicated concierge support",
+          ],
+          value: "$1,450",
+          popular: false,
+        },
+        {
+          name: "Luxe Escape Experience",
+          price: "$1,290",
+          nights: "4 Nights",
+          description: "The complete island luxury experience",
+          includes: [
+            "4-night sea view stay",
+            "Daily breakfast included",
+            "$200 curated dining credit",
+            "VIP nightclub access +1 entry",
+            "$100 transport credit",
+            "Security credit",
+            "Private airport transfers",
+            "24/7 concierge WhatsApp support",
+          ],
+          value: "$1,950",
+          popular: true,
+        },
+        {
+          name: "Yacht & Island Elite",
+          price: "$1,650",
+          nights: "3 Nights",
+          description: "Premium island hopping experience",
+          includes: [
+            "3-night beachfront hotel stay",
+            "Half-day private yacht/boat tour",
+            "Complimentary bottle (exclusive requested bottle is subject to approval)",
+            "$100 transport credit",
+            "Security credit",
+            "Private transfers",
+            "Concierge planning service",
+          ],
+          value: "$2,500",
+          popular: false,
+        },
+      ],
+      palawanBundles: [
+        {
+          name: "VIP Weekend Access",
+          price: "$980",
+          nights: "3 Nights",
+          description: "Perfect for elevated island escapes",
+          includes: [
+            "3-night luxury hotel stay",
+            "$100 curated dining credit",
+            "$100 transport credit",
+            "Security credit",
+            "Private airport transfers",
+            "Dedicated concierge support",
+          ],
+          value: "$1,450",
+          popular: false,
+        },
+        {
+          name: "Luxe Escape Experience",
+          price: "$1,290",
+          nights: "4 Nights",
+          description: "The complete island luxury experience",
+          includes: [
+            "4-night sea view stay",
+            "Daily breakfast included",
+            "$200 curated dining credit",
+            "VIP nightclub access +1 entry",
+            "$100 transport credit",
+            "Security credit",
+            "Private airport transfers",
+            "24/7 concierge WhatsApp support",
+          ],
+          value: "$1,950",
+          popular: true,
+        },
+        {
+          name: "Yacht & Island Elite",
+          price: "$1,650",
+          nights: "3 Nights",
+          description: "Premium island hopping experience",
+          includes: [
+            "3-night beachfront hotel stay",
+            "Half-day private yacht/boat tour",
+            "Complimentary bottle (exclusive requested bottle is subject to approval)",
+            "$100 transport credit",
+            "Security credit",
+            "Private transfers",
+            "Concierge planning service",
+          ],
+          value: "$2,500",
           popular: false,
         },
       ],
@@ -560,6 +702,7 @@ export function Membership() {
                       </div>
 
                       <button
+                        onClick={() => handleOpenCalendar(bundle.name)}
                         className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -601,7 +744,235 @@ export function Membership() {
             ) : (
               // Available Packages
               <>
-                {/* Phuket Packages */}
+                {currentDestination.name === "Philippines" && (
+                  <>
+                    {/* Boracay Packages */}
+                    <div className="col-span-full mb-4 md:mb-8">
+                      <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 mb-4 md:mb-6">
+                        Boracay
+                      </h3>
+                    </div>
+                    <div className="col-span-full mb-4 md:mb-8">
+                      <button
+                        onClick={() => setShowCustomExperience(true)}
+                        className="w-full py-3 md:py-4 bg-slate-900/50 border-2 border-yellow-500 text-yellow-500 font-bold text-base md:text-lg rounded-full hover:bg-slate-800/50 transition-all flex items-center justify-center gap-2"
+                      >
+                        <span className="text-lg md:text-xl">✨</span>
+                        CREATE MY OWN EXPERIENCE
+                      </button>
+                    </div>
+                    {currentDestination.boracayBundles?.map((bundle, index) => (
+                      <div
+                        key={`boracay-${index}`}
+                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                          bundle.popular ? "border-cyan-500" : "border-slate-700"
+                        }`}
+                      >
+                        {bundle.popular && (
+                          <div className="absolute top-0 right-0 px-4 md:px-6 py-2 bg-cyan-500 text-slate-950 font-bold text-xs md:text-sm rounded-bl-xl flex items-center gap-1 md:gap-2">
+                            <Star className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" />
+                            MOST POPULAR
+                          </div>
+                        )}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full -mr-16 -mt-16"></div>
+                        <div className="mb-4 md:mb-6">
+                          <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">
+                            {bundle.name}
+                          </h3>
+                          <p className="text-sm text-cyan-400 mb-2 md:mb-3">
+                            {bundle.nights}
+                          </p>
+                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                            {bundle.description}
+                          </p>
+                          <div className="mb-3 md:mb-4">
+                            <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
+                              Retail Value: {bundle.value}
+                            </div>
+                            <div className="text-3xl md:text-4xl font-bold text-white">
+                              {bundle.price}
+                              <span className="text-sm md:text-base text-slate-400 font-normal">
+                                {" "}
+                                per person
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
+                          {bundle.includes.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-2 md:gap-3">
+                              <Check className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                              <span className="text-slate-300 text-xs md:text-sm leading-relaxed">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                        <button 
+                          onClick={() => handleOpenCalendar(bundle.name)}
+                          className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                          bundle.popular
+                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
+                            : "bg-slate-700 text-white hover:bg-slate-600"
+                        }`}>
+                          Reserve Your Dates
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Siargao Packages */}
+                    <div className="col-span-full mb-4 md:mb-8 mt-8">
+                      <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 mb-4 md:mb-6">
+                        Siargao
+                      </h3>
+                    </div>
+                    <div className="col-span-full mb-4 md:mb-8">
+                      <button
+                        onClick={() => setShowCustomExperience(true)}
+                        className="w-full py-3 md:py-4 bg-slate-900/50 border-2 border-yellow-500 text-yellow-500 font-bold text-base md:text-lg rounded-full hover:bg-slate-800/50 transition-all flex items-center justify-center gap-2"
+                      >
+                        <span className="text-lg md:text-xl">✨</span>
+                        CREATE MY OWN EXPERIENCE
+                      </button>
+                    </div>
+                    {currentDestination.siargaoBundles?.map((bundle, index) => (
+                      <div
+                        key={`siargao-${index}`}
+                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                          bundle.popular ? "border-cyan-500" : "border-slate-700"
+                        }`}
+                      >
+                        {bundle.popular && (
+                          <div className="absolute top-0 right-0 px-4 md:px-6 py-2 bg-cyan-500 text-slate-950 font-bold text-xs md:text-sm rounded-bl-xl flex items-center gap-1 md:gap-2">
+                            <Star className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" />
+                            MOST POPULAR
+                          </div>
+                        )}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full -mr-16 -mt-16"></div>
+                        <div className="mb-4 md:mb-6">
+                          <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">
+                            {bundle.name}
+                          </h3>
+                          <p className="text-sm text-cyan-400 mb-2 md:mb-3">
+                            {bundle.nights}
+                          </p>
+                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                            {bundle.description}
+                          </p>
+                          <div className="mb-3 md:mb-4">
+                            <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
+                              Retail Value: {bundle.value}
+                            </div>
+                            <div className="text-3xl md:text-4xl font-bold text-white">
+                              {bundle.price}
+                              <span className="text-sm md:text-base text-slate-400 font-normal">
+                                {" "}
+                                per person
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
+                          {bundle.includes.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-2 md:gap-3">
+                              <Check className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                              <span className="text-slate-300 text-xs md:text-sm leading-relaxed">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                        <button 
+                          onClick={() => handleOpenCalendar(bundle.name)}
+                          className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                          bundle.popular
+                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
+                            : "bg-slate-700 text-white hover:bg-slate-600"
+                        }`}>
+                          Reserve Your Dates
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Palawan Packages */}
+                    <div className="col-span-full mb-4 md:mb-8 mt-8">
+                      <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 mb-4 md:mb-6">
+                        Palawan
+                      </h3>
+                    </div>
+                    <div className="col-span-full mb-4 md:mb-8">
+                      <button
+                        onClick={() => setShowCustomExperience(true)}
+                        className="w-full py-3 md:py-4 bg-slate-900/50 border-2 border-yellow-500 text-yellow-500 font-bold text-base md:text-lg rounded-full hover:bg-slate-800/50 transition-all flex items-center justify-center gap-2"
+                      >
+                        <span className="text-lg md:text-xl">✨</span>
+                        CREATE MY OWN EXPERIENCE
+                      </button>
+                    </div>
+                    {currentDestination.palawanBundles?.map((bundle, index) => (
+                      <div
+                        key={`palawan-${index}`}
+                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                          bundle.popular ? "border-cyan-500" : "border-slate-700"
+                        }`}
+                      >
+                        {bundle.popular && (
+                          <div className="absolute top-0 right-0 px-4 md:px-6 py-2 bg-cyan-500 text-slate-950 font-bold text-xs md:text-sm rounded-bl-xl flex items-center gap-1 md:gap-2">
+                            <Star className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" />
+                            MOST POPULAR
+                          </div>
+                        )}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full -mr-16 -mt-16"></div>
+                        <div className="mb-4 md:mb-6">
+                          <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">
+                            {bundle.name}
+                          </h3>
+                          <p className="text-sm text-cyan-400 mb-2 md:mb-3">
+                            {bundle.nights}
+                          </p>
+                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                            {bundle.description}
+                          </p>
+                          <div className="mb-3 md:mb-4">
+                            <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
+                              Retail Value: {bundle.value}
+                            </div>
+                            <div className="text-3xl md:text-4xl font-bold text-white">
+                              {bundle.price}
+                              <span className="text-sm md:text-base text-slate-400 font-normal">
+                                {" "}
+                                per person
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
+                          {bundle.includes.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-2 md:gap-3">
+                              <Check className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                              <span className="text-slate-300 text-xs md:text-sm leading-relaxed">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                        <button 
+                          onClick={() => handleOpenCalendar(bundle.name)}
+                          className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                          bundle.popular
+                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
+                            : "bg-slate-700 text-white hover:bg-slate-600"
+                        }`}>
+                          Reserve Your Dates
+                        </button>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {currentDestination.name === "Thailand" && (
+                  <>
+                    {/* Phuket Packages */}
                 <div className="col-span-full mb-4 md:mb-8">
                   <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 mb-4 md:mb-6">
                     Phuket
@@ -685,6 +1056,7 @@ export function Membership() {
                       </div>
 
                       <button
+                        onClick={() => handleOpenCalendar(bundle.name)}
                         className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -769,6 +1141,7 @@ export function Membership() {
                           </div>
 
                           <button
+                            onClick={() => handleOpenCalendar(bundle.name)}
                             className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                               bundle.popular
                                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -882,6 +1255,7 @@ export function Membership() {
                           </div>
 
                           <button
+                            onClick={() => handleOpenCalendar(bundle.name)}
                             className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                               bundle.popular
                                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -922,6 +1296,8 @@ export function Membership() {
                     </div>
                   </div>
                 </div>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -1310,25 +1686,25 @@ export function Membership() {
                 </div>
               </div>
 
-              {/* Helicopter Transfer */}
+              {/* Aviation Credit */}
               <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <div className="flex items-center gap-2 mb-3">
                   <Plane className="w-6 h-6 text-cyan-400" />
                   <h3 className="text-xl font-bold">
-                    Helicopter Transfer
+                    Aviation Credit
                   </h3>
                 </div>
                 <div className="grid md:grid-cols-1 gap-3 max-w-md">
                   <button
                     onClick={() =>
                       toggleCustomSelection(
-                        "helicopter",
+                        "aviation",
                         "Fixed Rate",
                         349,
                       )
                     }
                     className={`p-3 rounded-lg border-2 transition-all ${
-                      customSelections["helicopter-Fixed Rate"]
+                      customSelections["aviation-Fixed Rate"]
                         ? "border-cyan-500 bg-cyan-500/20"
                         : "border-slate-600 hover:border-slate-500"
                     }`}
@@ -1340,7 +1716,7 @@ export function Membership() {
                       $349
                     </div>
                     <div className="text-xs text-slate-400 mt-1">
-                      Transfers to selected destinations
+                      Helicopter transfers starting from $349
                     </div>
                   </button>
                 </div>
@@ -1358,7 +1734,9 @@ export function Membership() {
                     ${calculateTotal()}
                   </div>
                 </div>
-                <button className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all">
+                <button 
+                  onClick={() => handleOpenCalendar("Custom Experience")}
+                  className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all">
                   Book My Experience
                 </button>
               </div>
@@ -1380,7 +1758,7 @@ export function Membership() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-8">
             <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
               <div className="text-2xl font-bold text-cyan-400 mb-2">
                 +$499
@@ -1395,13 +1773,25 @@ export function Membership() {
 
             <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
               <div className="text-2xl font-bold text-cyan-400 mb-2">
-                +$349
+                +$349+
               </div>
               <h3 className="font-semibold mb-2">
-                Helicopter Transfer
+                Aviation Credit
               </h3>
               <p className="text-sm text-slate-400">
-                Private airport arrival
+                Starting from $349 for helicopter transfers
+              </p>
+            </div>
+
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+              <div className="text-2xl font-bold text-cyan-400 mb-2">
+                +$249
+              </div>
+              <h3 className="font-semibold mb-2">
+                Accommodation Credit
+              </h3>
+              <p className="text-sm text-slate-400">
+                Premium stays & upgrades
               </p>
             </div>
 
@@ -1410,24 +1800,20 @@ export function Membership() {
                 +$199
               </div>
               <h3 className="font-semibold mb-2">
-                Transport / Security Credit
+                Club Credit
               </h3>
               <p className="text-sm text-slate-400">
-                Premium transfers & protection
+                Dining, nightlife, & security
               </p>
             </div>
-
-            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-              <div className="text-2xl font-bold text-cyan-400 mb-2">
-                +$199
-              </div>
-              <h3 className="font-semibold mb-2">
-                Restaurant + Nightclub Credit
-              </h3>
-              <p className="text-sm text-slate-400">
-                Dining & nightlife package
-              </p>
-            </div>
+          </div>
+          
+          <div className="text-center">
+            <button 
+              onClick={() => handleOpenCalendar("Custom Quote / Enhanced Experience")}
+              className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-slate-900 font-bold rounded-full hover:from-yellow-400 hover:to-yellow-500 transition-all text-lg shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]">
+              Request a Custom Quote
+            </button>
           </div>
         </div>
       </section>
@@ -1455,37 +1841,47 @@ export function Membership() {
 
                 <div className="grid md:grid-cols-2 gap-8 mb-8">
                   <div>
-                    <div className="text-4xl font-bold text-white mb-2">
-                      $490
-                      <span className="text-lg text-slate-400">
-                        {" "}
-                        /year
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="text-4xl font-bold text-white">
+                        $245
+                        <span className="text-lg text-slate-400">
+                          {" "}
+                          /year
+                        </span>
+                      </div>
+                      <span className="bg-gradient-to-r from-red-600 to-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase tracking-wider shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                        HALF PRICE
                       </span>
                     </div>
-                    <p className="text-sm text-slate-400 mb-6">
-                      One-time annual fee for year-round
-                      benefits
+                    <p className="text-sm text-slate-400 mb-2">
+                      One-time annual fee for year-round benefits
                     </p>
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-lg mb-6">
+                      <p className="text-yellow-500 font-bold text-sm">
+                        $245 Welcome Credit
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Expires in 12 months. Minimum 5 transactions in separate bookings.
+                      </p>
+                    </div>
 
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          Early access to yacht dates & limited
-                          availability
+                          Affiliate partners access visibility only for Elite Members
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          Priority VIP table allocation at all
-                          partner clubs
+                          2 TRIPS @ 5% credit
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          5% experience credit on all bookings
+                          Priority VIP table allocation at all partner clubs
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
@@ -1497,20 +1893,19 @@ export function Membership() {
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          Dedicated concierge hotline & WhatsApp
+                          Dedicated concierge HOTLINE & WHATSAPP GROUP AND TELEGRAM GROUP ACCESS
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          Access to member-only events & parties
+                          Access to member-only events & parties (Meet Hollywood celebrities and network with the world's highest net worth/network individuals)
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          Physical & digital RFID membership
-                          card
+                          Physical & digital QR CODE membership card
                         </span>
                       </div>
                     </div>
@@ -1524,18 +1919,18 @@ export function Membership() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-slate-400">
-                            2 trips @ 5% credit:
+                            Welcome Credit:
                           </span>
                           <span className="text-white">
-                            ~$130 saved
+                            $245
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-400">
-                            Priority yacht access:
+                            2 trips @ 5% credit:
                           </span>
                           <span className="text-white">
-                            Priceless
+                            ~$130 saved
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -1551,13 +1946,15 @@ export function Membership() {
                             Total value:
                           </span>
                           <span className="text-cyan-400">
-                            $530+
+                            $775+
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <button className="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-600 text-slate-950 font-bold rounded-xl hover:from-yellow-600 hover:to-orange-700 transition-all">
+                    <button 
+                      onClick={() => setIsEliteModalOpen(true)}
+                      className="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-600 text-slate-950 font-bold rounded-xl hover:from-yellow-600 hover:to-orange-700 transition-all">
                       Become an Elite Member
                     </button>
                   </div>
@@ -1763,6 +2160,30 @@ export function Membership() {
           </div>
         </div>
       </section>
+
+      {/* Booking Calendar Modal */}
+      <BookingCalendarModal
+        isOpen={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        onConfirm={handleCalendarConfirm}
+        bundleName={selectedBundleForCalendar}
+      />
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        onComplete={handleCheckoutComplete}
+        selectedDate={selectedDate}
+        bundleName={selectedBundleForCalendar}
+      />
+
+      {/* Elite Membership Modal */}
+      <EliteMembershipModal
+        isOpen={isEliteModalOpen}
+        onClose={() => setIsEliteModalOpen(false)}
+        onComplete={handleEliteCheckoutComplete}
+      />
     </div>
   );
 }

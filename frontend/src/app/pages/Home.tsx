@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Shield, MapPin, Award, Users, ChevronRight } from "lucide-react";
 import videoBackground from "../../imports/small.mp4";
 import thailandBackground from "../../imports/thailand-background.png";
+import philippinesBackground from "../../imports/philippines-background.png";
 import { homeDestinationsComingSoonBackgrounds } from "../comingSoonBackgrounds";
 
 export function Home() {
@@ -164,9 +165,9 @@ export function Home() {
               },
               {
                 name: "Philippines",
-                image: homeDestinationsComingSoonBackgrounds.philippines,
-                highlight: "Manila & Cebu",
-                comingSoon: true,
+                image: philippinesBackground,
+                highlight: "Boracay, Siargao, Palawan",
+                comingSoon: false,
               },
               {
                 name: "Colombia",
