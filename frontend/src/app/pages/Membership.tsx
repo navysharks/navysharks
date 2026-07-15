@@ -22,7 +22,14 @@ import { BookingCalendarModal } from "../components/BookingCalendarModal";
 import { CheckoutModal } from "../components/CheckoutModal";
 import { EliteMembershipModal } from "../components/EliteMembershipModal";
 
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate, useSearchParams } from "react-router";
+import { useEffect } from "react";
+
 export function Membership() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showRFID, setShowRFID] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedDestination, setSelectedDestination] =
@@ -34,19 +41,89 @@ export function Membership() {
   >({});
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [selectedBundleForCalendar, setSelectedBundleForCalendar] = useState("");
+  const [selectedBundlePrice, setSelectedBundlePrice] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
+  const [currency, setCurrency] = useState<"USD" | "GBP" | "AUD">("USD");
 
-  const handleEliteCheckoutComplete = () => {
-    setIsEliteModalOpen(false);
-    toast.success("Redirecting to Stripe...", {
-      description: "You are being securely redirected to Stripe Checkout for Elite Membership.",
-    });
+  const formatPrice = (priceStr: string) => {
+    const rawPrice = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
+    if (isNaN(rawPrice)) return priceStr;
+
+    if (currency === "GBP") {
+      const converted = Math.round(rawPrice * 0.78);
+      return `£${converted.toLocaleString()}`;
+    }
+    if (currency === "AUD") {
+      const converted = Math.round(rawPrice * 1.5);
+      return `A$${converted.toLocaleString()}`;
+    }
+    return priceStr; // Default USD
   };
 
-  const handleOpenCalendar = (bundleName: string) => {
+  const handleEliteCheckoutComplete = async () => {
+    if (!user) {
+      toast.error("Please login to proceed with Elite Membership");
+      navigate("/login");
+      return;
+    }
+
+    setIsEliteModalOpen(false);
+    toast.loading("Preparing secure checkout...", { id: "checkout" });
+    
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payment/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.url) {
+        toast.dismiss("checkout");
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+    } catch (error: any) {
+      toast.error("Checkout failed", { id: "checkout", description: error.message });
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const sessionId = searchParams.get("verification_session_id");
+    if (sessionId && user) {
+      // User just returned from Stripe Identity
+      // In a real app we might fetch the verification status from backend
+      // But for this demo, we assume they completed it and proceed to payment
+      handleEliteCheckoutComplete();
+      
+      // Clean up the URL
+      searchParams.delete("verification_session_id");
+      navigate("/membership", { replace: true });
+    }
+
+    const joinParam = searchParams.get("join");
+    if (joinParam === "true") {
+      setIsEliteModalOpen(true);
+      searchParams.delete("join");
+      navigate("/membership", { replace: true });
+    }
+  }, [searchParams, user, navigate]);
+
+  const handleOpenCalendar = (bundleName: string, price: string) => {
     setSelectedBundleForCalendar(bundleName);
+    setSelectedBundlePrice(price);
     setIsCalendarOpen(true);
   };
 
@@ -56,11 +133,51 @@ export function Membership() {
     setIsCheckoutOpen(true);
   };
 
-  const handleCheckoutComplete = () => {
+  const handleCheckoutComplete = async (selectedAddons: string[] = []) => {
+    if (!user) {
+      toast.error("Please login to proceed with your booking");
+      navigate("/login");
+      return;
+    }
+
+    if (!selectedDate) {
+      toast.error("Please select a date first");
+      return;
+    }
+
     setIsCheckoutOpen(false);
-    toast.success("Redirecting to Stripe...", {
-      description: "You are being securely redirected to Stripe Checkout.",
-    });
+    toast.loading("Preparing secure checkout...", { id: "bundle-checkout" });
+
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payment/create-bundle-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+          bundleName: selectedBundleForCalendar,
+          price: selectedBundlePrice,
+          date: selectedDate.toISOString(),
+          addons: selectedAddons,
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.url) {
+        toast.dismiss("bundle-checkout");
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+    } catch (error: any) {
+      toast.error("Checkout failed", { id: "bundle-checkout", description: error.message });
+      console.error(error);
+    }
   };
 
   const generateRFID = async () => {
@@ -595,10 +712,10 @@ export function Membership() {
         </div>
       </section>
 
-      {/* Destination Selector */}
-      <section className="py-8 border-y border-slate-800 sticky top-24 bg-slate-950/95 backdrop-blur-sm z-40">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-4 justify-center">
+      {/* Destination Selector & Currency Toggle */}
+      <section className="py-8 border-y border-slate-800 bg-slate-950 relative">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
             {Object.keys(destinations).map((key) => {
               const dest =
                 destinations[key as keyof typeof destinations];
@@ -616,6 +733,22 @@ export function Membership() {
                 </button>
               );
             })}
+          </div>
+
+          <div className="flex bg-slate-900 rounded-full p-1 border border-slate-800">
+            {(["USD", "GBP", "AUD"] as const).map((curr) => (
+              <button
+                key={curr}
+                onClick={() => setCurrency(curr)}
+                className={`px-4 py-2 rounded-full font-semibold text-sm transition-all ${
+                  currency === curr
+                    ? "bg-slate-700 text-white"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {curr}
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -672,13 +805,23 @@ export function Membership() {
                         <p className="text-slate-300 text-sm mb-3 md:mb-4">
                           {bundle.description}
                         </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
 
                         <div className="mb-3 md:mb-4">
                           <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                            Retail Value: {bundle.value}
+                            Retail Value: {formatPrice(bundle.value)}
                           </div>
                           <div className="text-3xl md:text-4xl font-bold text-white">
-                            {bundle.price}
+                            {formatPrice(bundle.price)}
                             <span className="text-sm md:text-base text-slate-400 font-normal">
                               {" "}
                               per person
@@ -783,14 +926,26 @@ export function Membership() {
                             {bundle.nights}
                           </p>
                           <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                            {bundle.description}
+                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                          {bundle.description}
+                        </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
                           </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                              Retail Value: {bundle.value}
+                              Retail Value: {formatPrice(bundle.value)}
                             </div>
                             <div className="text-3xl md:text-4xl font-bold text-white">
-                              {bundle.price}
+                              {formatPrice(bundle.price)}
                               <span className="text-sm md:text-base text-slate-400 font-normal">
                                 {" "}
                                 per person
@@ -857,14 +1012,26 @@ export function Membership() {
                             {bundle.nights}
                           </p>
                           <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                            {bundle.description}
+                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                          {bundle.description}
+                        </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
                           </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                              Retail Value: {bundle.value}
+                              Retail Value: {formatPrice(bundle.value)}
                             </div>
                             <div className="text-3xl md:text-4xl font-bold text-white">
-                              {bundle.price}
+                              {formatPrice(bundle.price)}
                               <span className="text-sm md:text-base text-slate-400 font-normal">
                                 {" "}
                                 per person
@@ -931,14 +1098,26 @@ export function Membership() {
                             {bundle.nights}
                           </p>
                           <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                            {bundle.description}
+                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                          {bundle.description}
+                        </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
                           </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                              Retail Value: {bundle.value}
+                              Retail Value: {formatPrice(bundle.value)}
                             </div>
                             <div className="text-3xl md:text-4xl font-bold text-white">
-                              {bundle.price}
+                              {formatPrice(bundle.price)}
                               <span className="text-sm md:text-base text-slate-400 font-normal">
                                 {" "}
                                 per person
@@ -1026,13 +1205,23 @@ export function Membership() {
                         <p className="text-slate-300 text-sm mb-3 md:mb-4">
                           {bundle.description}
                         </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
 
                         <div className="mb-3 md:mb-4">
                           <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                            Retail Value: {bundle.value}
+                            Retail Value: {formatPrice(bundle.value)}
                           </div>
                           <div className="text-3xl md:text-4xl font-bold text-white">
-                            {bundle.price}
+                            {formatPrice(bundle.price)}
                             <span className="text-sm md:text-base text-slate-400 font-normal">
                               {" "}
                               per person
@@ -1107,15 +1296,27 @@ export function Membership() {
                               {bundle.nights}
                             </p>
                             <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                              {bundle.description}
+                            <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                          {bundle.description}
+                        </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
                             </p>
 
                             <div className="mb-3 md:mb-4">
                               <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                                Retail Value: {bundle.value}
+                                Retail Value: {formatPrice(bundle.value)}
                               </div>
                               <div className="text-3xl md:text-4xl font-bold text-white">
-                                {bundle.price}
+                                {formatPrice(bundle.price)}
                                 <span className="text-sm md:text-base text-slate-400 font-normal">
                                   {" "}
                                   per person
@@ -1141,7 +1342,7 @@ export function Membership() {
                           </div>
 
                           <button
-                            onClick={() => handleOpenCalendar(bundle.name)}
+                            onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                             className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                               bundle.popular
                                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -1221,15 +1422,27 @@ export function Membership() {
                               {bundle.nights}
                             </p>
                             <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                              {bundle.description}
+                            <p className="text-slate-300 text-sm mb-3 md:mb-4">
+                          {bundle.description}
+                        </p>
+                        {index === 1 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                            🇬🇧 Popular among UK travelers
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
+                            🔥 Booked 37 times this month
+                          </div>
+                        )}
                             </p>
 
                             <div className="mb-3 md:mb-4">
                               <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
-                                Retail Value: {bundle.value}
+                                Retail Value: {formatPrice(bundle.value)}
                               </div>
                               <div className="text-3xl md:text-4xl font-bold text-white">
-                                {bundle.price}
+                                {formatPrice(bundle.price)}
                                 <span className="text-sm md:text-base text-slate-400 font-normal">
                                   {" "}
                                   per person
@@ -1255,7 +1468,7 @@ export function Membership() {
                           </div>
 
                           <button
-                            onClick={() => handleOpenCalendar(bundle.name)}
+                            onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                             className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                               bundle.popular
                                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -1899,7 +2112,7 @@ export function Membership() {
                       <div className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-300">
-                          Access to member-only events & parties (Meet Hollywood celebrities and network with the world's highest net worth/network individuals)
+                          Access to member-only events & parties (<span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-cyan-400 animate-pulse" style={{ textShadow: "0 0 10px rgba(34, 211, 238, 0.4)" }}>Meet Hollywood celebrities</span> and network with the world's highest net worth/network individuals)
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
@@ -2176,6 +2389,7 @@ export function Membership() {
         onComplete={handleCheckoutComplete}
         selectedDate={selectedDate}
         bundleName={selectedBundleForCalendar}
+        bundlePrice={selectedBundlePrice}
       />
 
       {/* Elite Membership Modal */}

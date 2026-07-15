@@ -1,9 +1,66 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { Shield, MapPin, Award, Users, ChevronRight } from "lucide-react";
+import { Shield, MapPin, Award, Users, ChevronRight, Star } from "lucide-react";
 import videoBackground from "../../imports/small.mp4";
 import thailandBackground from "../../imports/thailand-background.png";
 import philippinesBackground from "../../imports/philippines-background.png";
 import { homeDestinationsComingSoonBackgrounds } from "../comingSoonBackgrounds";
+
+import thailandBangkok from "../../assets/Thailand/Bangkok.jpg";
+import thailandPhuket from "../../assets/Thailand/Phuket.jpg";
+import thailandPattaya from "../../assets/Thailand/pattaya.jpg";
+
+import phBoracay from "../../assets/Philippines/Boracay.jpg";
+import phPalawan from "../../assets/Philippines/Palawan.jpg";
+import phSiargao from "../../assets/Philippines/Siargao.jpg";
+
+function DestinationCard({ dest }: { dest: any }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!dest.images || dest.images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % dest.images.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [dest.images]);
+
+  return (
+    <div className="relative h-80 rounded-xl overflow-hidden group cursor-pointer">
+      {dest.images ? (
+        dest.images.map((img: string, idx: number) => (
+          <img
+            key={idx}
+            src={img}
+            alt={dest.name}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+              idx === currentImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            } group-hover:scale-110`}
+          />
+        ))
+      ) : (
+        <img
+          src={dest.image}
+          alt={dest.name}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent z-10 pointer-events-none">
+        {dest.comingSoon && (
+          <div className="absolute top-6 left-0 right-0 text-center">
+            <p className="text-3xl font-bold text-cyan-400 bg-slate-950/80 inline-block px-6 py-3 rounded-lg">
+              Coming Soon
+            </p>
+          </div>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <h3 className="text-2xl font-bold mb-2">{dest.name}</h3>
+          <p className="text-cyan-400">{dest.highlight}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Home() {
   return (
@@ -21,16 +78,18 @@ export function Home() {
         </div>
 
         {/* Clean Video */}
-        <div className="relative w-full" style={{ height: '60vh' }}>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src={videoBackground} type="video/mp4" />
-          </video>
+        <div className="relative w-full max-w-7xl mx-auto px-4 md:px-8">
+          <div className="relative w-full rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-cyan-900/20 aspect-video bg-black">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src={videoBackground} type="video/mp4" />
+            </video>
+          </div>
         </div>
 
         {/* CTA Below Video */}
@@ -159,13 +218,13 @@ export function Home() {
             {[
               {
                 name: "Thailand",
-                image: thailandBackground,
-                highlight: "Bangkok & Pattaya",
+                images: [thailandBangkok, thailandPhuket, thailandPattaya],
+                highlight: "Bangkok, Phuket & Pattaya",
                 comingSoon: false,
               },
               {
                 name: "Philippines",
-                image: philippinesBackground,
+                images: [phBoracay, phPalawan, phSiargao],
                 highlight: "Boracay, Siargao, Palawan",
                 comingSoon: false,
               },
@@ -182,29 +241,7 @@ export function Home() {
                 comingSoon: true,
               },
             ].map((dest) => (
-              <div
-                key={dest.name}
-                className="relative h-80 rounded-xl overflow-hidden group cursor-pointer"
-              >
-                <img
-                  src={dest.image}
-                  alt={dest.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent">
-                  {dest.comingSoon && (
-                    <div className="absolute top-6 left-0 right-0 text-center">
-                      <p className="text-3xl font-bold text-cyan-400 bg-slate-950/80 inline-block px-6 py-3 rounded-lg">
-                        Coming Soon
-                      </p>
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-2xl font-bold mb-2">{dest.name}</h3>
-                    <p className="text-cyan-400">{dest.highlight}</p>
-                  </div>
-                </div>
-              </div>
+              <DestinationCard key={dest.name} dest={dest} />
             ))}
           </div>
 
@@ -216,6 +253,73 @@ export function Home() {
               Explore All Destinations
               <ChevronRight size={20} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-slate-900 border-t border-b border-slate-800">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-cyan-400">
+              Elite Member Experiences
+            </h2>
+            <p className="text-xl text-slate-300">
+              Don't just take our word for it
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-slate-950 p-8 rounded-2xl border border-slate-800 relative">
+              <div className="text-cyan-500 mb-4 flex gap-1">
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+              </div>
+              <p className="text-slate-300 italic mb-6">
+                "The Bangkok Genesis bundle exceeded every expectation. The VIP nightclub access alone paid for itself. Navy Sharks handled everything seamlessly."
+              </p>
+              <div>
+                <h4 className="font-bold text-white">James W.</h4>
+                <p className="text-sm text-slate-500">London, UK • Elite Member</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-950 p-8 rounded-2xl border border-slate-800 relative">
+              <div className="text-cyan-500 mb-4 flex gap-1">
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+              </div>
+              <p className="text-slate-300 italic mb-6">
+                "I was skeptical about booking a yacht party abroad, but the concierge service was phenomenal. Top-tier luxury without the usual tourist traps."
+              </p>
+              <div>
+                <h4 className="font-bold text-white">Michael R.</h4>
+                <p className="text-sm text-slate-500">Sydney, AUS • Privé Member</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-950 p-8 rounded-2xl border border-slate-800 relative">
+              <div className="text-cyan-500 mb-4 flex gap-1">
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-5 h-5 fill-current" />
+              </div>
+              <p className="text-slate-300 italic mb-6">
+                "The safe zones and micro-locations they recommend are spot on. It completely changed my perspective on traveling to Southeast Asia."
+              </p>
+              <div>
+                <h4 className="font-bold text-white">David K.</h4>
+                <p className="text-sm text-slate-500">New York, USA • Elite Member</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

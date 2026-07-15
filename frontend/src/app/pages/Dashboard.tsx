@@ -1,0 +1,413 @@
+import { useNavigate, Link } from "react-router";
+import { useAuth } from "../contexts/AuthContext";
+import { Shield, MessageCircle, Star, MapPin, Users, Crown, CalendarDays, ScanLine, X, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { db } from "../../firebase";
+
+export function Dashboard() {
+  const { user, userData } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) return null; // ProtectedRoute handles redirect
+
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(true);
+  const [showRFID, setShowRFID] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [rfidCode, setRfidCode] = useState("");
+
+  const handleShowRFID = async () => {
+    setShowRFID(true);
+    if (!rfidCode) {
+      setIsGenerating(true);
+      await new Promise(r => setTimeout(r, 1500));
+      setRfidCode(`NS-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
+      setIsGenerating(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const q = query(
+          collection(db, "users", user.uid, "bookings"),
+          orderBy("createdAt", "desc")
+        );
+        const snapshot = await getDocs(q);
+        const fetchedBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setBookings(fetchedBookings);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+    
+    fetchBookings();
+  }, [user.uid]);
+
+  const isElite = userData?.membershipStatus === "Elite";
+
+  return (
+    <div className="min-h-screen pt-24 pb-12 bg-slate-950 relative overflow-hidden">
+      {/* Background Gradient Orbs */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+      
+      <div className="container mx-auto px-4 max-w-5xl relative z-10">
+        {/* Compact Header */}
+        <div className="mb-10">
+          <p className="text-slate-500 text-sm tracking-wider uppercase mb-1">Welcome back</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            {userData?.name || user.email}
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">{userData?.email || user.email}</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Profile / Digital Card */}
+          <div className="lg:col-span-5 space-y-6">
+            {isElite ? (
+              // Elite Black Card Design - Hyper Realistic
+              <div className="relative w-full aspect-[1.586/1] bg-gradient-to-br from-slate-900 via-slate-950 to-black rounded-2xl p-5 md:p-6 flex flex-col justify-between border border-cyan-500/30 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(6,182,212,0.15)] overflow-hidden group">
+                {/* Brushed metal / Carbon fiber subtle texture */}
+                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800 via-transparent to-transparent mix-blend-overlay" />
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.03)_50%,transparent_75%,transparent_100%)] bg-[length:4px_4px]" />
+                
+                {/* Card subtle shine on hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full duration-1000 transition-transform ease-in-out" />
+                
+                {/* Top Row: Logo & Shield */}
+                <div className="flex justify-between items-start relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center drop-shadow-xl">
+                      <img src="/src/assets/logo.png" alt="Navy Sharks" className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-white font-bold tracking-[0.2em] text-[10px] md:text-sm drop-shadow-md">NAVY SHARKS</span>
+                  </div>
+                  <Shield className="w-6 h-6 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+                </div>
+
+                <div className="relative z-10 flex-1 flex flex-col justify-center mt-2 md:mt-1">
+                  <div className="flex items-center gap-3 mb-2 md:mb-3">
+                    {/* Realistic EMV Chip */}
+                    <div className="w-9 h-6 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-md p-1 shadow-inner relative overflow-hidden border border-yellow-700/50">
+                      <div className="absolute inset-0 border border-yellow-700/30 rounded-md" />
+                      <div className="absolute top-1/2 left-0 w-full h-[1px] bg-yellow-700/30" />
+                      <div className="absolute left-1/3 top-0 w-[1px] h-full bg-yellow-700/30" />
+                      <div className="absolute right-1/3 top-0 w-[1px] h-full bg-yellow-700/30" />
+                      <div className="absolute top-1/4 left-1/4 right-1/4 bottom-1/4 border border-yellow-700/30 rounded-[2px]" />
+                    </div>
+                    
+                    {/* Contactless Icon */}
+                    <svg className="w-5 h-5 text-slate-400 rotate-90 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                      <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                      <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                    </svg>
+                  </div>
+                  
+                  {/* Fake Card Number for realism */}
+                  <div className="text-slate-300 font-mono text-sm md:text-base tracking-[0.15em] mb-1 text-shadow-sm opacity-90 truncate">
+                    ELIT  8842  0001  9999
+                  </div>
+                </div>
+                
+                {/* Bottom Row: Name, Dates, Mastercard Logo */}
+                <div className="relative z-10 flex justify-between items-end mt-auto">
+                  <div className="max-w-[75%]">
+                    <p className="text-cyan-400/80 text-[8px] md:text-[9px] font-mono tracking-widest mb-0.5 uppercase">Elite Member</p>
+                    <h2 className="text-base md:text-lg font-mono tracking-widest text-white drop-shadow-md truncate">
+                      {userData?.name ? userData.name.toUpperCase() : 'VIP MEMBER'}
+                    </h2>
+                    <div className="flex items-center gap-4 mt-1.5 md:mt-2">
+                      <div>
+                        <p className="text-[7px] md:text-[8px] text-slate-400 uppercase tracking-widest mb-0.5">Valid Thru</p>
+                        <p className="text-[10px] md:text-xs text-slate-300 font-mono leading-none">12/99</p>
+                      </div>
+                      <div>
+                        <p className="text-[7px] md:text-[8px] text-slate-400 uppercase tracking-widest mb-0.5">Member Since</p>
+                        <p className="text-[10px] md:text-xs text-slate-300 font-mono leading-none">
+                          {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString(undefined, { month: '2-digit', year: '2-digit' }) : '07/26'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Mastercard-style circles */}
+                  <div className="flex -space-x-2 md:-space-x-3 opacity-90 pb-1">
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-cyan-500/60 backdrop-blur-md mix-blend-screen" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-blue-600/60 backdrop-blur-md mix-blend-screen" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Standard Card Design
+              <div className="w-full aspect-[1.586/1] bg-slate-900/40 backdrop-blur-xl rounded-2xl p-8 flex flex-col justify-between border border-slate-800 shadow-xl">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2 opacity-60">
+                    <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center grayscale">
+                      <img src="/src/assets/logo.png" alt="Navy Sharks" className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-slate-400 font-bold tracking-widest text-sm">NAVY SHARKS</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-slate-500 text-xs font-mono tracking-widest mb-1 uppercase">Standard Account</p>
+                    <h2 className="text-xl font-mono tracking-widest text-slate-300">
+                      {userData?.name ? userData.name.toUpperCase() : 'GUEST'}
+                    </h2>
+                  </div>
+                  
+                  <div>
+                    <p className="text-[10px] text-slate-600 uppercase tracking-wider mb-0.5">Joined</p>
+                    <p className="text-sm text-slate-500 font-mono">
+                      {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : '2026'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isElite && (
+              <button
+                onClick={handleShowRFID}
+                className="w-full flex items-center justify-center gap-3 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all text-cyan-400 font-bold"
+              >
+                <ScanLine className="w-5 h-5" />
+                Show VIP RFID Code
+              </button>
+            )}
+
+            {/* Quick Links */}
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                to="/partners"
+                className="flex items-center gap-3 p-4 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-cyan-500/30 hover:bg-slate-900 transition-all group"
+              >
+                <Users className="w-5 h-5 text-cyan-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Partners</span>
+              </Link>
+              <Link
+                to="/membership"
+                className="flex items-center gap-3 p-4 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-cyan-500/30 hover:bg-slate-900 transition-all group"
+              >
+                <Crown className="w-5 h-5 text-cyan-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Experiences</span>
+              </Link>
+              <Link
+                to="/destinations"
+                className="flex items-center gap-3 p-4 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-cyan-500/30 hover:bg-slate-900 transition-all group"
+              >
+                <MapPin className="w-5 h-5 text-cyan-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Destinations</span>
+              </Link>
+              <Link
+                to="/contact"
+                className="flex items-center gap-3 p-4 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-cyan-500/30 hover:bg-slate-900 transition-all group"
+              >
+                <MessageCircle className="w-5 h-5 text-cyan-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Contact</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Benefits Area */}
+          <div className="lg:col-span-7">
+            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 md:p-10 h-full shadow-2xl">
+              {isElite ? (
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center border border-cyan-500/20">
+                      <Star className="w-6 h-6 text-cyan-400 fill-cyan-400/20" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-white tracking-tight">Concierge Access</h2>
+                      <p className="text-cyan-400 text-sm font-medium">Status: Active</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-slate-300 mb-10 leading-relaxed text-lg">
+                    Your exclusive access to Navy Sharks premium services is ready. Connect with your personal concierge using the secure channels below for VIP bookings, event access, and urgent requests.
+                  </p>
+
+                  <div className="space-y-5 mt-auto">
+                    <a
+                      href="https://wa.me/12345678900?text=Hi%20Navy%20Sharks%20Concierge,%20I%20need%20assistance."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-5 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl hover:border-green-500/50 hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] hover:scale-[1.02] transition-all duration-300 group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                          <MessageCircle className="w-6 h-6 text-green-500" />
+                        </div>
+                        <div>
+                          <span className="block font-bold text-white text-lg group-hover:text-green-400 transition-colors">WhatsApp Concierge</span>
+                          <span className="text-sm text-slate-400">Direct Message</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded-full">24/7 Priority</span>
+                      </div>
+                    </a>
+                    
+                    <a
+                      href="https://t.me/navysharks_concierge"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-5 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:scale-[1.02] transition-all duration-300 group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                          <MessageCircle className="w-6 h-6 text-blue-500" />
+                        </div>
+                        <div>
+                          <span className="block font-bold text-white text-lg group-hover:text-blue-400 transition-colors">Telegram Secure Line</span>
+                          <span className="text-sm text-slate-400">Encrypted Chat</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full">End-to-End</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-16 h-full flex flex-col items-center justify-center">
+                  <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center border border-slate-800 mb-8 relative">
+                    <Shield className="w-10 h-10 text-slate-600" />
+                    <div className="absolute inset-0 rounded-full border border-cyan-500/30 scale-[1.2] opacity-50" />
+                    <div className="absolute inset-0 rounded-full border border-cyan-500/10 scale-[1.4] opacity-30" />
+                  </div>
+                  
+                  <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Unlock Elite Status</h2>
+                  <p className="text-slate-400 mb-10 max-w-md mx-auto text-lg leading-relaxed">
+                    Upgrade to Elite Membership to access the 24/7 personal concierge, VIP travel bookings, and secure international networks.
+                  </p>
+                  
+                  <button
+                    onClick={() => navigate('/membership?join=true')}
+                    className="group relative inline-flex items-center justify-center gap-2 px-10 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold text-lg transition-all hover:scale-105 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                    <span className="relative z-10 flex items-center gap-2">
+                      Upgrade Now <span className="opacity-70 font-normal">| $4,900</span>
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* My Bookings Section */}
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <CalendarDays className="w-6 h-6 text-cyan-500" />
+            <h2 className="text-2xl font-bold text-white tracking-tight">My Bookings</h2>
+          </div>
+          
+          <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-6 md:p-8 shadow-2xl min-h-[200px]">
+            {loadingBookings ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="w-8 h-8 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+              </div>
+            ) : bookings.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {bookings.map((booking) => (
+                  <div key={booking.id} className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-white text-lg leading-tight">{booking.bundleName}</h3>
+                      <span className="px-2.5 py-1 bg-green-500/10 text-green-400 text-xs font-bold rounded-full border border-green-500/20">
+                        Confirmed
+                      </span>
+                    </div>
+                    <div className="space-y-2 mb-4">
+                      <p className="text-sm text-slate-400 flex justify-between">
+                        <span>Date:</span>
+                        <span className="text-slate-300 font-medium">
+                          {new Date(booking.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </p>
+                      <p className="text-sm text-slate-400 flex justify-between">
+                        <span>Amount Paid:</span>
+                        <span className="text-slate-300 font-medium">
+                          ${(booking.amountPaid / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="pt-4 border-t border-slate-700/50">
+                      <p className="text-xs text-slate-500 text-center">Booking ID: {booking.id.slice(0, 8).toUpperCase()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <CalendarDays className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-slate-300 mb-2">No bookings yet</h3>
+                <p className="text-slate-500 mb-6">Explore our curated destinations and exclusive experiences.</p>
+                <Link
+                  to="/membership"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-slate-800 text-cyan-400 hover:bg-slate-700 rounded-full font-medium transition-colors border border-slate-700 hover:border-cyan-500/50"
+                >
+                  View Experiences
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* RFID Modal */}
+      {showRFID && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-8 relative shadow-2xl flex flex-col items-center">
+            <button
+              onClick={() => setShowRFID(false)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="w-16 h-16 bg-cyan-500/10 rounded-full flex items-center justify-center mb-6">
+              <ScanLine className="w-8 h-8 text-cyan-400" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white mb-2 text-center">Your RFID Pass</h3>
+            <p className="text-slate-400 text-center text-sm mb-8">
+              Present this code to our affiliate partners for exclusive access.
+            </p>
+
+            <div className="w-full aspect-square bg-slate-950 rounded-2xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-10 h-10 text-cyan-500 animate-spin mb-4" />
+                  <p className="text-cyan-400 font-mono text-sm animate-pulse">GENERATING SECURE CODE...</p>
+                </>
+              ) : (
+                <>
+                  {/* Fake Barcode Lines */}
+                  <div className="flex gap-1 h-20 mb-6 items-center w-full justify-center px-4">
+                    {[...Array(24)].map((_, i) => (
+                      <div key={i} className={`bg-white rounded-full ${Math.random() > 0.5 ? 'w-1' : 'w-2'} ${Math.random() > 0.5 ? 'h-full' : 'h-3/4'}`} />
+                    ))}
+                  </div>
+                  <div className="text-3xl font-mono font-bold tracking-[0.25em] text-white drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+                    {rfidCode}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/10 to-transparent pointer-events-none" />
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

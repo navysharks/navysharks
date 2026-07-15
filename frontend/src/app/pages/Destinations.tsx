@@ -1,14 +1,59 @@
+import { useState, useEffect } from "react";
 import { MapPin, Shield, Utensils } from "lucide-react";
 import thailandBackground from "../../imports/thailand-background.png";
 import philippinesBackground from "../../imports/philippines-background.png";
 import { homeDestinationsComingSoonBackgrounds } from "../comingSoonBackgrounds";
+
+import thailandBangkok from "../../assets/Thailand/Bangkok.jpg";
+import thailandPhuket from "../../assets/Thailand/Phuket.jpg";
+import thailandPattaya from "../../assets/Thailand/pattaya.jpg";
+
+import phBoracay from "../../assets/Philippines/Boracay.jpg";
+import phPalawan from "../../assets/Philippines/Palawan.jpg";
+import phSiargao from "../../assets/Philippines/Siargao.jpg";
+
+function DestinationImageCrossfade({ dest }: { dest: any }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!dest.images || dest.images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % dest.images.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [dest.images]);
+
+  return (
+    <div className="relative h-96 rounded-2xl overflow-hidden group cursor-pointer">
+      {dest.images ? (
+        dest.images.map((img: string, idx: number) => (
+          <img
+            key={idx}
+            src={img}
+            alt={dest.country}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+              idx === currentImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            } group-hover:scale-105`}
+          />
+        ))
+      ) : (
+        <img
+          src={dest.image}
+          alt={dest.country}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none"></div>
+    </div>
+  );
+}
 
 export function Destinations() {
   const destinations = [
     {
       country: "Thailand",
       cities: ["Bangkok", "Phuket", "Pattaya"],
-      image: thailandBackground,
+      images: [thailandBangkok, thailandPhuket, thailandPattaya],
       description:
         "Experience the perfect blend of ancient culture, modern luxury, and unbeatable value in Southeast Asia.",
       highlights: [
@@ -21,7 +66,7 @@ export function Destinations() {
     {
       country: "Philippines",
       cities: ["Boracay", "Siargao", "Palawan"],
-      image: philippinesBackground,
+      images: [phBoracay, phPalawan, phSiargao],
       description:
         "Discover tropical paradise with world-famous hospitality, pristine beaches, and incredible luxury experiences.",
       highlights: [
@@ -88,14 +133,7 @@ export function Destinations() {
                 }`}
               >
                 <div className={index % 2 === 1 ? "md:order-2" : ""}>
-                  <div className="relative h-96 rounded-2xl overflow-hidden">
-                    <img
-                      src={dest.image}
-                      alt={dest.country}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
-                  </div>
+                  <DestinationImageCrossfade dest={dest} />
                 </div>
 
                 <div className={index % 2 === 1 ? "md:order-1" : ""}>

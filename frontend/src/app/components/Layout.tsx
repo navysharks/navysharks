@@ -1,11 +1,13 @@
 import { Outlet, Link, useLocation } from "react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import logo from "figma:asset/07af61dd9bcec36f8143b071d775139b06bfec77.png";
+import { useAuth } from "../contexts/AuthContext";
 
 export function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { path: "/", label: "Home" },
@@ -20,15 +22,24 @@ export function Layout() {
     return location.pathname.startsWith(path);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setMobileMenuOpen(false);
+    setIsSignOutModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800">
         <nav className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center">
-              <img src={logo} alt="Navy Sharks" className="h-24 w-auto" />
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-12 h-12 flex items-center justify-center transition-transform group-hover:scale-105">
+                <img src="/src/assets/logo.png" alt="Navy Sharks Logo" className="w-full h-full object-contain" />
+              </div>
+              <span className="text-white font-bold tracking-[0.2em] text-lg hidden sm:block drop-shadow-md">NAVY SHARKS</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -46,12 +57,39 @@ export function Layout() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/membership"
-                className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full hover:from-cyan-600 hover:to-blue-700 transition-all"
-              >
-                Join Now
-              </Link>
+              <div className="flex items-center gap-4 border-l border-slate-700 pl-8">
+                {user ? (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => setIsSignOutModalOpen(true)}
+                      className="px-6 py-2 bg-slate-800 text-slate-300 rounded-full hover:bg-slate-700 hover:text-white transition-all text-sm font-medium border border-slate-700"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      to="/membership?join=true"
+                      className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full hover:from-cyan-600 hover:to-blue-700 transition-all text-sm font-medium"
+                    >
+                      Join Now
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -78,13 +116,45 @@ export function Layout() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/membership"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block w-full px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-center rounded-full"
-              >
-                Join Now
-              </Link>
+              <div className="pt-4 mt-2 border-t border-slate-800 flex flex-col gap-3">
+                {user ? (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full py-2 text-cyan-400 text-center rounded-full border border-cyan-500/30 hover:bg-cyan-500/10"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setIsSignOutModalOpen(true);
+                      }}
+                      className="block w-full py-2 text-slate-300 text-center rounded-full border border-slate-700 hover:bg-slate-800"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full py-2 text-slate-300 text-center rounded-full border border-slate-700 hover:bg-slate-800"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      to="/membership?join=true"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-center rounded-full"
+                    >
+                      Join Now
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           )}
         </nav>
@@ -100,7 +170,12 @@ export function Layout() {
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <img src={logo} alt="Navy Sharks" className="h-16 w-auto mb-4" />
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 flex items-center justify-center opacity-80">
+                  <img src="/src/assets/logo.png" alt="Navy Sharks Logo" className="w-full h-full object-contain grayscale" />
+                </div>
+                <span className="text-xl font-bold tracking-widest text-white">NAVY SHARKS</span>
+              </div>
               <p className="text-slate-400 text-sm">
                 Elite concierge club for sophisticated travelers seeking
                 exceptional value and experiences.
@@ -142,6 +217,38 @@ export function Layout() {
           </div>
         </div>
       </footer>
+
+      {/* Sign Out Confirmation Modal */}
+      {isSignOutModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl relative">
+            <button
+              onClick={() => setIsSignOutModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-xl font-bold text-white mb-2">Sign Out</h3>
+            <p className="text-slate-400 mb-6 text-sm">
+              Are you sure you want to sign out of your account?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsSignOutModalOpen(false)}
+                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-700 text-slate-300 font-medium hover:bg-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-red-500/10 text-red-500 font-medium border border-red-500/30 hover:bg-red-500 hover:text-white transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

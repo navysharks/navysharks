@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { X, User, Mail, Phone, Camera, CreditCard, CheckCircle2, ScanFace, Upload, MessageCircle } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 interface EliteMembershipModalProps {
   isOpen: boolean;
@@ -14,6 +17,8 @@ export function EliteMembershipModal({
 }: EliteMembershipModalProps) {
   const [step, setStep] = useState<"details" | "verification">("details");
   const [verificationStatus, setVerificationStatus] = useState<"pending" | "scanning" | "success">("pending");
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -22,11 +27,34 @@ export function EliteMembershipModal({
     setStep("verification");
   };
 
-  const simulateStripeIdentity = () => {
+  const simulateStripeIdentity = async () => {
+    if (!user) {
+      toast.error("You must be logged in to verify identity.");
+      navigate("/login");
+      return;
+    }
+
     setVerificationStatus("scanning");
-    setTimeout(() => {
-      setVerificationStatus("success");
-    }, 2500);
+    toast.loading("Preparing secure verification...", { id: "identity" });
+
+    try {
+      const response = await fetch("http://localhost:5000/api/identity/create-verification-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        toast.dismiss("identity");
+        window.location.href = data.url; // Redirect to Stripe Identity
+      } else {
+        throw new Error(data.error || "Failed to create verification session");
+      }
+    } catch (error: any) {
+      toast.error("Verification failed", { id: "identity", description: error.message });
+      setVerificationStatus("pending");
+    }
   };
 
   return (
@@ -203,10 +231,10 @@ export function EliteMembershipModal({
                         <h4 className="font-bold text-white">Government ID</h4>
                         <p className="text-sm text-slate-400">Upload Passport or Driver's License</p>
                       </div>
-                      <div className="ml-auto">
+                      <div className="ml-auto shrink-0">
                         {verificationStatus === 'pending' && (
-                          <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">
-                            <Upload className="w-4 h-4" /> Upload
+                          <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                            <Upload className="w-4 h-4 shrink-0" /> Upload
                           </button>
                         )}
                       </div>
@@ -225,12 +253,12 @@ export function EliteMembershipModal({
                           {verificationStatus === 'scanning' ? 'Scanning face... Please hold still.' : 'Verify your identity securely'}
                         </p>
                       </div>
-                      <div className="ml-auto">
+                      <div className="ml-auto shrink-0">
                         {verificationStatus === 'pending' && (
                           <button 
                             onClick={simulateStripeIdentity}
-                            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-950 rounded-lg text-sm font-bold transition-colors">
-                            <Camera className="w-4 h-4" /> Start Scan
+                            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-950 rounded-lg text-sm font-bold transition-colors whitespace-nowrap">
+                            <Camera className="w-4 h-4 shrink-0" /> Start Scan
                           </button>
                         )}
                       </div>

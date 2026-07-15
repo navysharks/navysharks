@@ -4,9 +4,10 @@ import { X, User, Mail, Phone, Camera, CreditCard, CheckCircle2, ScanFace, Uploa
 interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: () => void;
+  onComplete: (addons: string[]) => void;
   selectedDate: Date | null;
   bundleName: string;
+  bundlePrice: string;
 }
 
 export function CheckoutModal({
@@ -15,14 +16,30 @@ export function CheckoutModal({
   onComplete,
   selectedDate,
   bundleName,
+  bundlePrice,
 }: CheckoutModalProps) {
-  const [step, setStep] = useState<"details" | "verification">("details");
+  const [step, setStep] = useState<"details" | "addons" | "verification">("details");
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [verificationStatus, setVerificationStatus] = useState<"pending" | "scanning" | "success">("pending");
 
-  if (!isOpen) return null;
+  const addonsList = [
+    { id: "helicopter", name: "Helicopter Airport Transfer", price: 380, icon: "🚁" },
+    { id: "yacht_ext", name: "Extend Yacht Charter (+4 hrs)", price: 600, icon: "🛥️" },
+    { id: "vip_night", name: "Extra VIP Nightlife Experience", price: 250, icon: "🌙" },
+  ];
 
-  const handleNext = (e: React.FormEvent) => {
+  const toggleAddon = (id: string) => {
+    setSelectedAddons(prev => 
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    );
+  };
+
+  const handleNextDetails = (e: React.FormEvent) => {
     e.preventDefault();
+    setStep("addons");
+  };
+
+  const handleNextAddons = () => {
     setStep("verification");
   };
 
@@ -32,6 +49,8 @@ export function CheckoutModal({
       setVerificationStatus("success");
     }, 2500);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-start justify-center p-4 overflow-y-auto pt-10 pb-10">
@@ -55,7 +74,7 @@ export function CheckoutModal({
         <div className="flex">
           {/* Progress Sidebar */}
           <div className="hidden md:block w-1/3 bg-slate-800/30 p-6 border-r border-slate-800">
-            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-800">
+            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-800">
               <div className="relative flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 ${step === 'details' ? 'bg-cyan-500 text-slate-950' : 'bg-green-500 text-white'}`}>
                   {step === 'details' ? '1' : <CheckCircle2 className="w-5 h-5" />}
@@ -63,14 +82,20 @@ export function CheckoutModal({
                 <div className={`font-semibold ${step === 'details' ? 'text-white' : 'text-slate-400'}`}>Guest Details</div>
               </div>
               <div className="relative flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 ${step === 'addons' ? 'bg-cyan-500 text-slate-950' : step === 'verification' ? 'bg-green-500 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
+                  {step === 'addons' ? '2' : step === 'verification' ? <CheckCircle2 className="w-5 h-5" /> : '2'}
+                </div>
+                <div className={`font-semibold ${step === 'addons' ? 'text-white' : 'text-slate-400'}`}>Enhancements</div>
+              </div>
+              <div className="relative flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 ${step === 'verification' ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
-                  2
+                  3
                 </div>
                 <div className={`font-semibold ${step === 'verification' ? 'text-white' : 'text-slate-400'}`}>ID Verification</div>
               </div>
               <div className="relative flex items-center gap-3 opacity-50">
                 <div className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 border border-slate-700 flex items-center justify-center shrink-0 z-10">
-                  3
+                  4
                 </div>
                 <div className="font-semibold text-slate-400">Payment</div>
               </div>
@@ -80,7 +105,7 @@ export function CheckoutModal({
           {/* Content Area */}
           <div className="w-full md:w-2/3 p-6">
             {step === "details" && (
-              <form onSubmit={handleNext} className="space-y-4">
+              <form onSubmit={handleNextDetails} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">First Name</label>
@@ -141,9 +166,60 @@ export function CheckoutModal({
                   type="submit"
                   className="w-full mt-6 py-4 bg-cyan-500 text-slate-950 font-bold rounded-xl hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                 >
-                  Continue to Verification
+                  Continue to Enhancements
                 </button>
               </form>
+            )}
+
+            {step === "addons" && (
+              <div className="space-y-4">
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-6">
+                  <h3 className="font-bold text-white text-lg">Enhance Your Experience</h3>
+                  <p className="text-sm text-slate-400">Select premium add-ons for your trip.</p>
+                </div>
+
+                <div className="space-y-3">
+                  {addonsList.map(addon => (
+                    <div
+                      key={addon.id}
+                      onClick={() => toggleAddon(addon.id)}
+                      className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex items-center justify-between ${
+                        selectedAddons.includes(addon.id) 
+                          ? 'border-cyan-500 bg-cyan-500/10' 
+                          : 'border-slate-800 bg-slate-900 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="text-2xl">{addon.icon}</div>
+                        <div>
+                          <h4 className="font-bold text-white">{addon.name}</h4>
+                          <p className="text-sm text-slate-400">+${addon.price}</p>
+                        </div>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        selectedAddons.includes(addon.id) ? 'border-cyan-500 bg-cyan-500' : 'border-slate-600'
+                      }`}>
+                        {selectedAddons.includes(addon.id) && <CheckCircle2 className="w-4 h-4 text-slate-950" />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-4 mt-6">
+                  <button
+                    onClick={() => setStep("details")}
+                    className="w-1/3 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={handleNextAddons}
+                    className="w-2/3 py-4 bg-cyan-500 text-slate-950 font-bold rounded-xl hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                  >
+                    Continue to Verification
+                  </button>
+                </div>
+              </div>
             )}
 
             {step === "verification" && (
@@ -201,9 +277,38 @@ export function CheckoutModal({
                   </div>
                 </div>
 
+                {/* Breakdown Summary */}
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mt-6">
+                  <h4 className="text-white font-bold mb-3 border-b border-slate-800 pb-2">Order Summary</h4>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">{bundleName}</span>
+                      <span className="text-slate-300 font-mono">{bundlePrice}</span>
+                    </div>
+                    {selectedAddons.map(addonId => {
+                      const addon = addonsList.find(a => a.id === addonId);
+                      return addon ? (
+                        <div key={addon.id} className="flex justify-between text-sm">
+                          <span className="text-slate-400">{addon.name}</span>
+                          <span className="text-slate-300 font-mono">+${addon.price}</span>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                  <div className="flex justify-between text-base font-bold pt-3 border-t border-slate-800">
+                    <span className="text-white">Total Estimate</span>
+                    <span className="text-cyan-400 font-mono">
+                      ${parseInt(bundlePrice.replace(/[^0-9]/g, ''), 10) + selectedAddons.reduce((sum, id) => {
+                        const addon = addonsList.find(a => a.id === id);
+                        return sum + (addon ? addon.price : 0);
+                      }, 0)}
+                    </span>
+                  </div>
+                </div>
+
                 <button
                   disabled={verificationStatus !== 'success'}
-                  onClick={onComplete}
+                  onClick={() => onComplete(selectedAddons)}
                   className={`w-full mt-6 py-4 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] ${
                     verificationStatus === 'success' 
                       ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400" 
@@ -212,7 +317,7 @@ export function CheckoutModal({
                 >
                   Continue to Payment (Stripe Checkout)
                 </button>
-                <p className="text-xs text-center text-slate-500">
+                <p className="text-xs text-center text-slate-500 mt-2">
                   Secured by Stripe Identity. Your data is encrypted.
                 </p>
               </div>
