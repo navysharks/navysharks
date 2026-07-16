@@ -87,41 +87,6 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
                 console.error("Error sending confirmation email:", emailError);
               }
             }
-          } else if (session.metadata && session.metadata.type === 'prive_membership') {
-            // Update the user's document in Firestore to reflect Privé Membership
-            await db.collection('users').doc(userId).set({
-              membershipStatus: 'Privé',
-              membershipPurchaseDate: new Date(),
-              stripeSessionId: session.id,
-              stripeCustomerId: session.customer,
-            }, { merge: true });
-            console.log(`Successfully upgraded user ${userId} to Privé Member!`);
-
-            // Send welcome email for Privé
-            const customerEmail = session.customer_details ? session.customer_details.email : null;
-            if (customerEmail && process.env.SMTP_USER) {
-              try {
-                await transporter.sendMail({
-                  from: `"Navy Sharks Concierge" <${process.env.SMTP_USER}>`,
-                  to: customerEmail,
-                  subject: `Welcome to Privé Membership`,
-                  html: `
-                    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #020617; color: #f8fafc; padding: 20px; border-radius: 10px;">
-                      <h2 style="color: #22d3ee;">Navy Sharks Concierge</h2>
-                      <h3>Welcome to Privé!</h3>
-                      <p>Your annual Privé Membership is now active.</p>
-                      <p>You now have access to premium concierge services, vetted safe zones, and curated lifestyle experiences.</p>
-                      <p>Total Paid: ${(session.amount_total / 100).toFixed(2)} ${session.currency.toUpperCase()}</p>
-                      <br/>
-                      <p>Our team will reach out to you shortly via WhatsApp to finalize your profile.</p>
-                    </div>
-                  `
-                });
-                console.log(`Sent Privé welcome email to ${customerEmail}`);
-              } catch (emailError) {
-                console.error("Error sending Privé welcome email:", emailError);
-              }
-            }
           } else {
             // Default: Update the user's document in Firestore to reflect Elite Membership
             await db.collection('users').doc(userId).set({

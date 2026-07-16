@@ -5,151 +5,135 @@ import { useAuth } from "../contexts/AuthContext";
 export function Partners() {
   const { userData } = useAuth();
   const isElite = userData?.membershipStatus === "Elite";
-  const [activeCategory, setActiveCategory] = useState("hotels");
+  const [activeCategory, setActiveCategory] = useState("marine");
   const [selectedCountry, setSelectedCountry] = useState("all");
 
   const categories = [
+    { id: "marine", label: "Marine & Yachts", icon: Anchor },
+    { id: "nightclubs", label: "VIP Nightlife", icon: Music },
     { id: "hotels", label: "Hotels & Resorts", icon: Hotel },
     { id: "restaurants", label: "Fine Dining", icon: Utensils },
-    { id: "nightclubs", label: "VIP Nightlife", icon: Music },
-    { id: "marine", label: "Marine & Yachts", icon: Anchor },
   ];
 
   const partners = {
+    marine: [
+      {
+        name: "Caribbean Yacht Charters",
+        location: "Cartagena, Colombia",
+        image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1080",
+        country: "Colombia",
+        discount: "Exclusive member access",
+      },
+      {
+        name: "Rio Jet Ski Adventures",
+        location: "Copacabana, Rio",
+        image: "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1080",
+        country: "Brazil",
+        discount: "Curated marine allocation",
+      },
+      {
+        name: "Manila Bay Yacht Club",
+        location: "Manila, Philippines",
+        image: "https://images.unsplash.com/photo-1574041160351-46ab3469e38e?auto=format&fit=crop&q=80&w=1080",
+        country: "Philippines",
+        discount: "Exclusive sunset allocation",
+      },
+      {
+        name: "Phuket Luxury Charters",
+        location: "Phuket, Thailand",
+        image: "https://images.unsplash.com/photo-1510006851064-e6056cd0e3a8?auto=format&fit=crop&q=80&w=1080",
+        country: "Thailand",
+        discount: "Curated captain allocation",
+      },
+    ],
+    nightclubs: [
+      {
+        name: "Envy Rooftop Lounge",
+        location: "Medellín, Colombia",
+        image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&q=80&w=1080",
+        country: "Colombia",
+        discount: "Priority VIP tables",
+      },
+      {
+        name: "Warung Beach Club",
+        location: "Itaim Bibi, São Paulo",
+        image: "https://images.unsplash.com/photo-1578736641330-3155e606cd40?auto=format&fit=crop&q=80&w=1080",
+        country: "Brazil",
+        discount: "Priority VIP entry",
+      },
+      {
+        name: "Valkyrie Nightclub",
+        location: "BGC, Manila",
+        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=1080",
+        country: "Philippines",
+        discount: "Exclusive member access",
+      },
+      {
+        name: "Levels Club Bangkok",
+        location: "Sukhumvit, Bangkok",
+        image: "https://images.unsplash.com/photo-1557995168-98e3678ebdbd?auto=format&fit=crop&q=80&w=1080",
+        country: "Thailand",
+        discount: "Priority VIP tables",
+      },
+    ],
     hotels: [
       {
         name: "Luxury Boutique Medellín",
         location: "El Poblado, Medellín",
-        image:
-          "https://images.unsplash.com/photo-1738407283641-5e127f36f47d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc3MjQ0ODI2MHww&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1080",
         country: "Colombia",
-        discount: "20% off Rack Rate",
+        discount: "Curated seasonal allocation",
       },
       {
         name: "Copacabana Palace Resort",
         location: "Copacabana, Rio",
-        image:
-          "https://images.unsplash.com/photo-1684782654017-ce022311bf74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHBvb2wlMjBwYXJ0eXxlbnwxfHx8fDE3NzI0NDgyNTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1080",
         country: "Brazil",
-        discount: "25% off + Free Breakfast",
+        discount: "Exclusive member access",
       },
       {
         name: "Manila Bay Premium Suites",
         location: "BGC, Manila",
-        image:
-          "https://images.unsplash.com/photo-1561811358-21aef14f0551?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaGlsaXBwaW5lcyUyMGx1eHVyeSUyMHJlc29ydHxlbnwxfHx8fDE3NzI0NDgyNTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1542314831-c6a4d14cdce8?auto=format&fit=crop&q=80&w=1080",
         country: "Philippines",
-        discount: "30% off Penthouse",
+        discount: "Priority penthouse booking",
       },
       {
         name: "Phuket Beach Club Resort",
         location: "Patong, Phuket",
-        image:
-          "https://images.unsplash.com/photo-1560359614-870d1a7ea91d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0aGFpbGFuZCUyMGJlYWNoJTIwcGFydHl8ZW58MXx8fHwxNzcyNDQ4MjU1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&q=80&w=1080",
         country: "Thailand",
-        discount: "25% off Villa Stays",
+        discount: "Curated seasonal allocation",
       },
     ],
     restaurants: [
       {
         name: "El Cielo Gastronomic",
         location: "Zona Rosa, Bogotá",
-        image:
-          "https://images.unsplash.com/photo-1769773297747-bd00e31b33aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXN0YXVyYW50JTIwZGluaW5nfGVufDF8fHx8MTc3MjQ0MTAwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=1080",
         country: "Colombia",
-        discount: "15% off + Priority Seating",
+        discount: "Priority VIP seating",
       },
       {
         name: "Marius Degustare",
         location: "Copacabana, Rio",
-        image:
-          "https://images.unsplash.com/photo-1769773297747-bd00e31b33aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXN0YXVyYW50JTIwZGluaW5nfGVufDF8fHx8MTc3MjQ0MTAwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&q=80&w=1080",
         country: "Brazil",
-        discount: "20% off Total Bill",
+        discount: "Exclusive tasting menu access",
       },
       {
         name: "Antonio's Restaurant",
         location: "Tagaytay, Philippines",
-        image:
-          "https://images.unsplash.com/photo-1769773297747-bd00e31b33aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXN0YXVyYW50JTIwZGluaW5nfGVufDF8fHx8MTc3MjQ0MTAwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1502301103665-0b95cc738daf?auto=format&fit=crop&q=80&w=1080",
         country: "Philippines",
-        discount: "15% off Tasting Menu",
+        discount: "Priority VIP seating",
       },
       {
         name: "Nahm Bangkok",
         location: "Sathorn, Bangkok",
-        image:
-          "https://images.unsplash.com/photo-1769773297747-bd00e31b33aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXN0YXVyYW50JTIwZGluaW5nfGVufDF8fHx8MTc3MjQ0MTAwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+        image: "https://images.unsplash.com/photo-1414235077428-338988a2e8c0?auto=format&fit=crop&q=80&w=1080",
         country: "Thailand",
-        discount: "20% off + Free Aperitif",
-      },
-    ],
-    nightclubs: [
-      {
-        name: "Envy Rooftop Lounge",
-        location: "Medellín",
-        image:
-          "https://images.unsplash.com/photo-1770782986192-d786218838e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1cHNjYWxlJTIwbmlnaHRjbHViJTIwaW50ZXJpb3J8ZW58MXx8fHwxNzcyNDQ4MjYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Colombia",
-        discount: "Skip line + VIP table",
-      },
-      {
-        name: "Warung Beach Club",
-        location: "Itaim Bibi, São Paulo",
-        image:
-          "https://images.unsplash.com/photo-1578760427294-9871d8667bf3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWdodGNsdWIlMjB2aXAlMjBib3R0bGUlMjBzZXJ2aWNlfGVufDF8fHx8MTc3MjQ0ODI1NHww&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Brazil",
-        discount: "VIP Entry + Bottle Service",
-      },
-      {
-        name: "Valkyrie Nightclub",
-        location: "BGC, Manila",
-        image:
-          "https://images.unsplash.com/photo-1770782986192-d786218838e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1cHNjYWxlJTIwbmlnaHRjbHViJTIwaW50ZXJpb3J8ZW58MXx8fHwxNzcyNDQ4MjYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Philippines",
-        discount: "Complimentary Table",
-      },
-      {
-        name: "Levels Club Bangkok",
-        location: "Sukhumvit, Bangkok",
-        image:
-          "https://images.unsplash.com/photo-1578760427294-9871d8667bf3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWdodGNsdWIlMjB2aXAlMjBib3R0bGUlMjBzZXJ2aWNlfGVufDF8fHx8MTc3MjQ0ODI1NHww&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Thailand",
-        discount: "VIP Reserved Seating",
-      },
-    ],
-    marine: [
-      {
-        name: "Caribbean Yacht Charters",
-        location: "Cartagena",
-        image:
-          "https://images.unsplash.com/photo-1768424953203-998b815c84ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjB5YWNodCUyMHBhcnR5JTIwd29tZW58ZW58MXx8fHwxNzcyNDQ4MjUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Colombia",
-        discount: "20% off Charters",
-      },
-      {
-        name: "Rio Jet Ski Adventures",
-        location: "Copacabana, Rio",
-        image:
-          "https://images.unsplash.com/photo-1563172428-52ee6ec61b8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqZXQlMjBza2klMjB3YXRlciUyMHNwb3J0c3xlbnwxfHx8fDE3NzI0NDgyNTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Brazil",
-        discount: "25% off Rentals",
-      },
-      {
-        name: "Manila Bay Yacht Club",
-        location: "Manila",
-        image:
-          "https://images.unsplash.com/photo-1768424953203-998b815c84ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjB5YWNodCUyMHBhcnR5JTIwd29tZW58ZW58MXx8fHwxNzcyNDQ4MjUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Philippines",
-        discount: "30% off Sunset Cruise",
-      },
-      {
-        name: "Phuket Luxury Charters",
-        location: "Phuket",
-        image:
-          "https://images.unsplash.com/photo-1768424953203-998b815c84ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjB5YWNodCUyMHBhcnR5JTIwd29tZW58ZW58MXx8fHwxNzcyNDQ4MjUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-        country: "Thailand",
-        discount: "25% off + Captain Upgrade",
+        discount: "Complimentary curated aperitif",
       },
     ],
   };

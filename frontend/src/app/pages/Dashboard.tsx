@@ -1,9 +1,11 @@
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
-import { Shield, MessageCircle, Star, MapPin, Users, Crown, CalendarDays, ScanLine, X, Loader2 } from "lucide-react";
+import { Shield, MessageCircle, Star, MapPin, Users, Crown, CalendarDays, ScanLine, X, Loader2, Wallet, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../../firebase";
+import { toast } from "sonner";
+import { ConciergeChatModal } from "../components/ConciergeChatModal";
 
 export function Dashboard() {
   const { user, userData } = useAuth();
@@ -16,6 +18,10 @@ export function Dashboard() {
   const [showRFID, setShowRFID] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [rfidCode, setRfidCode] = useState("");
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [tripCredits, setTripCredits] = useState(0);
+  const [showClaimModal, setShowClaimModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
 
   const handleShowRFID = async () => {
     setShowRFID(true);
@@ -37,6 +43,14 @@ export function Dashboard() {
         const snapshot = await getDocs(q);
         const fetchedBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setBookings(fetchedBookings);
+        
+        // Calculate 5% Trip Credits
+        let spent = 0;
+        fetchedBookings.forEach((b: any) => {
+          spent += (b.amountPaid || 0) / 100;
+        });
+        setTotalSpent(spent);
+        setTripCredits(spent * 0.05);
       } catch (error) {
         console.error("Error fetching bookings:", error);
       } finally {
@@ -144,29 +158,45 @@ export function Dashboard() {
                 </div>
               </div>
             ) : (
-              // Standard Card Design
-              <div className="w-full aspect-[1.586/1] bg-slate-900/40 backdrop-blur-xl rounded-2xl p-8 flex flex-col justify-between border border-slate-800 shadow-xl">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2 opacity-60">
-                    <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center grayscale">
+              // Standard Card Design with Progress
+              <div className="w-full aspect-[1.586/1] bg-gradient-to-br from-slate-900 to-slate-950 backdrop-blur-xl rounded-2xl p-6 md:p-8 flex flex-col justify-between border border-slate-800 shadow-xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-800/40 via-transparent to-transparent pointer-events-none" />
+                
+                <div className="flex justify-between items-start relative z-10">
+                  <div className="flex items-center gap-2 opacity-70">
+                    <div className="w-10 h-10 flex items-center justify-center grayscale">
                       <img src="/src/assets/logo.png" alt="Navy Sharks" className="w-full h-full object-contain" />
                     </div>
-                    <span className="text-slate-400 font-bold tracking-widest text-sm">NAVY SHARKS</span>
+                    <span className="text-slate-400 font-bold tracking-widest text-xs md:text-sm">NAVY SHARKS</span>
+                  </div>
+                  <div className="px-3 py-1 bg-slate-800 rounded-full text-slate-400 text-[10px] uppercase tracking-widest border border-slate-700">
+                    Standard
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-slate-500 text-xs font-mono tracking-widest mb-1 uppercase">Standard Account</p>
-                    <h2 className="text-xl font-mono tracking-widest text-slate-300">
-                      {userData?.name ? userData.name.toUpperCase() : 'GUEST'}
-                    </h2>
-                  </div>
+                <div className="relative z-10 mt-auto">
+                  <h2 className="text-xl md:text-2xl font-mono tracking-widest text-white drop-shadow-md mb-6 truncate">
+                    {userData?.name ? userData.name.toUpperCase() : 'GUEST'}
+                  </h2>
                   
-                  <div>
-                    <p className="text-[10px] text-slate-600 uppercase tracking-wider mb-0.5">Joined</p>
-                    <p className="text-sm text-slate-500 font-mono">
-                      {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : '2026'}
+                  {/* Elite Progression Bar */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-[10px] md:text-xs font-medium uppercase tracking-wider">
+                      <span className="text-slate-400">Elite Progression</span>
+                      <span className="text-cyan-400">
+                        ${totalSpent.toLocaleString(undefined, { maximumFractionDigits: 0 })} / $4,900
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-1000 relative"
+                        style={{ width: `${Math.min((totalSpent / 4900) * 100, 100)}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-slate-500">
+                      Spend ${Math.max(4900 - totalSpent, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} more to unlock Elite Concierge.
                     </p>
                   </div>
                 </div>
@@ -182,6 +212,52 @@ export function Dashboard() {
                 Show VIP RFID Code
               </button>
             )}
+
+            {/* Trip Credits Wallet */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-[40px] pointer-events-none" />
+              
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+                    <Wallet className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold">Trip Credits</h3>
+                    <p className="text-slate-400 text-xs">Available Balance</p>
+                  </div>
+                </div>
+                {tripCredits > 0 && (
+                  <span className="px-2 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold rounded border border-green-500/20 uppercase tracking-wider">
+                    Ready to Claim
+                  </span>
+                )}
+              </div>
+              
+              <div className="flex items-end justify-between relative z-10">
+                <div>
+                  <div className="text-3xl font-extrabold text-white tracking-tight">
+                    ${tripCredits.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-1 text-slate-500 text-xs">
+                    <TrendingUp className="w-3 h-3 text-cyan-500" />
+                    <span>5% back from all bookings</span>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setShowClaimModal(true)}
+                  disabled={tripCredits === 0}
+                  className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
+                    tripCredits > 0 
+                      ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]" 
+                      : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                  }`}
+                >
+                  Claim
+                </button>
+              </div>
+            </div>
 
             {/* Quick Links */}
             <div className="grid grid-cols-2 gap-3">
@@ -216,89 +292,90 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Benefits Area */}
+          {/* Concierge Hub */}
           <div className="lg:col-span-7">
-            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 md:p-10 h-full shadow-2xl">
+            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 md:p-10 h-full shadow-2xl relative overflow-hidden flex flex-col">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] pointer-events-none" />
+              
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                  <Star className="w-6 h-6 text-blue-400 fill-blue-400/20" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white tracking-tight">Concierge Hub</h2>
+                  <p className="text-slate-400 text-sm font-medium">Your 24/7 Lifestyle Manager</p>
+                </div>
+              </div>
+
               {isElite ? (
-                <div className="h-full flex flex-col">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center border border-cyan-500/20">
-                      <Star className="w-6 h-6 text-cyan-400 fill-cyan-400/20" />
+                <div className="flex-1 flex flex-col">
+                  <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 mb-8 flex gap-4 items-center">
+                    <div className="relative">
+                      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100" alt="Concierge" className="w-16 h-16 rounded-full object-cover border-2 border-cyan-500/50" />
+                      <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-950" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-white tracking-tight">Concierge Access</h2>
-                      <p className="text-cyan-400 text-sm font-medium">Status: Active</p>
+                      <h3 className="text-white font-bold text-lg">Sarah Jenkins</h3>
+                      <p className="text-cyan-400 text-sm">Lead VIP Concierge</p>
+                      <p className="text-slate-400 text-xs mt-1">Online • Typically replies in 2 mins</p>
                     </div>
                   </div>
                   
-                  <p className="text-slate-300 mb-10 leading-relaxed text-lg">
-                    Your exclusive access to Navy Sharks premium services is ready. Connect with your personal concierge using the secure channels below for VIP bookings, event access, and urgent requests.
-                  </p>
-
-                  <div className="space-y-5 mt-auto">
-                    <a
-                      href="https://wa.me/12345678900?text=Hi%20Navy%20Sharks%20Concierge,%20I%20need%20assistance."
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-5 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl hover:border-green-500/50 hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] hover:scale-[1.02] transition-all duration-300 group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                          <MessageCircle className="w-6 h-6 text-green-500" />
-                        </div>
-                        <div>
-                          <span className="block font-bold text-white text-lg group-hover:text-green-400 transition-colors">WhatsApp Concierge</span>
-                          <span className="text-sm text-slate-400">Direct Message</span>
-                        </div>
+                  <div className="space-y-4 mt-auto">
+                    <button onClick={() => setShowChatModal(true)} className="w-full flex items-center justify-between p-4 bg-cyan-500 text-slate-950 rounded-xl hover:bg-cyan-400 transition-all font-bold group shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                      <div className="flex items-center gap-3">
+                        <MessageCircle className="w-5 h-5" />
+                        <span>Start Live Chat</span>
                       </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-xs font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded-full">24/7 Priority</span>
-                      </div>
-                    </a>
+                      <span className="text-xs bg-slate-950/20 px-2 py-1 rounded">Recommended</span>
+                    </button>
                     
-                    <a
-                      href="https://t.me/navysharks_concierge"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-5 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:scale-[1.02] transition-all duration-300 group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                          <MessageCircle className="w-6 h-6 text-blue-500" />
-                        </div>
-                        <div>
-                          <span className="block font-bold text-white text-lg group-hover:text-blue-400 transition-colors">Telegram Secure Line</span>
-                          <span className="text-sm text-slate-400">Encrypted Chat</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full">End-to-End</span>
-                      </div>
-                    </a>
+                    <div className="grid grid-cols-2 gap-4">
+                      <a
+                        href="https://wa.me/12345678900?text=Hi%20Navy%20Sharks%20Concierge,%20I%20need%20assistance."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 p-4 bg-slate-900 border border-slate-700 rounded-xl hover:border-green-500/50 hover:bg-slate-800 transition-all text-slate-300 hover:text-white group"
+                      >
+                        <MessageCircle className="w-4 h-4 text-green-500 group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-medium">WhatsApp</span>
+                      </a>
+                      
+                      <a
+                        href="https://t.me/navysharks_concierge"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 p-4 bg-slate-900 border border-slate-700 rounded-xl hover:border-blue-500/50 hover:bg-slate-800 transition-all text-slate-300 hover:text-white group"
+                      >
+                        <MessageCircle className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-medium">Telegram</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-16 h-full flex flex-col items-center justify-center">
-                  <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center border border-slate-800 mb-8 relative">
-                    <Shield className="w-10 h-10 text-slate-600" />
-                    <div className="absolute inset-0 rounded-full border border-cyan-500/30 scale-[1.2] opacity-50" />
-                    <div className="absolute inset-0 rounded-full border border-cyan-500/10 scale-[1.4] opacity-30" />
+                <div className="text-center py-10 h-full flex flex-col items-center justify-center relative">
+                  <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center border border-slate-800">
+                    <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center border border-slate-700 mb-6 relative">
+                      <Shield className="w-8 h-8 text-slate-500" />
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-lg">
+                        <Crown className="w-4 h-4 text-slate-950" />
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">Elite Exclusive</h3>
+                    <p className="text-slate-400 mb-8 max-w-sm mx-auto text-sm leading-relaxed px-4">
+                      Upgrade to Elite Membership to unlock your 24/7 personal concierge for VIP travel bookings, sold-out event access, and bespoke requests.
+                    </p>
+                    
+                    <button
+                      onClick={() => navigate('/membership?join=true')}
+                      className="group relative inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                    >
+                      <span>Upgrade Now</span>
+                      <span className="opacity-70 font-normal">| $4,900</span>
+                    </button>
                   </div>
-                  
-                  <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Unlock Elite Status</h2>
-                  <p className="text-slate-400 mb-10 max-w-md mx-auto text-lg leading-relaxed">
-                    Upgrade to Elite Membership to access the 24/7 personal concierge, VIP travel bookings, and secure international networks.
-                  </p>
-                  
-                  <button
-                    onClick={() => navigate('/membership?join=true')}
-                    className="group relative inline-flex items-center justify-center gap-2 px-10 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold text-lg transition-all hover:scale-105 overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                    <span className="relative z-10 flex items-center gap-2">
-                      Upgrade Now <span className="opacity-70 font-normal">| $4,900</span>
-                    </span>
-                  </button>
                 </div>
               )}
             </div>
@@ -408,6 +485,52 @@ export function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Claim Credits Modal */}
+      {showClaimModal && (        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-8 relative shadow-2xl flex flex-col items-center">
+            <button
+              onClick={() => setShowClaimModal(false)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+              <Wallet className="w-8 h-8 text-green-400" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white mb-2 text-center">Claim Credits</h3>
+            <p className="text-slate-400 text-center text-sm mb-8">
+              Your generated promo code for <b>${tripCredits.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> is ready to use on your next booking.
+            </p>
+
+            <div className="w-full bg-slate-950 rounded-2xl border-2 border-dashed border-green-500/50 flex flex-col items-center justify-center p-6 relative overflow-hidden mb-6">
+              <div className="text-2xl font-mono font-bold tracking-[0.25em] text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+                {userData?.name ? userData.name.substring(0,3).toUpperCase() : 'VIP'}-{Math.random().toString(36).substring(2, 6).toUpperCase()}
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-green-500/10 to-transparent pointer-events-none" />
+            </div>
+            
+            <button
+              onClick={() => {
+                toast.success("Promo code copied to clipboard!");
+                setShowClaimModal(false);
+              }}
+              className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(74,222,128,0.3)]"
+            >
+              Copy Code
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Concierge Chat Modal */}
+      <ConciergeChatModal
+        isOpen={showChatModal}
+        onClose={() => setShowChatModal(false)}
+        userId={user.uid}
+      />
     </div>
   );
 }

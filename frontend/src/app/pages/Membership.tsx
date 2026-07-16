@@ -1,7 +1,6 @@
 import {
   Check,
   Crown,
-  Zap,
   CreditCard,
   Star,
   Ship,
@@ -19,6 +18,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { experiencesComingSoonBackgrounds } from "../comingSoonBackgrounds";
 import { BookingCalendarModal } from "../components/BookingCalendarModal";
+import { AviationMap } from "../components/AviationMap";
 import { CheckoutModal } from "../components/CheckoutModal";
 import { EliteMembershipModal } from "../components/EliteMembershipModal";
 
@@ -687,7 +687,7 @@ export function Membership() {
     },
   };
 
-  const currentDestination =
+  const currentDestination: any =
     destinations[
       selectedDestination as keyof typeof destinations
     ];
@@ -774,7 +774,7 @@ export function Membership() {
                     currentDestination.bangkokBundles ||
                     currentDestination.bundles ||
                     []
-                  ).map((bundle, index) => (
+                  ).map((bundle: any, index: number) => (
                     <div
                       key={index}
                       className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -810,11 +810,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
 
                         <div className="mb-3 md:mb-4">
                           <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -831,7 +827,7 @@ export function Membership() {
                       </div>
 
                       <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                        {bundle.includes.map((item, idx) => (
+                        {bundle.includes.map((item: any, idx: number) => (
                           <div
                             key={idx}
                             className="flex items-start gap-2 md:gap-3"
@@ -845,7 +841,7 @@ export function Membership() {
                       </div>
 
                       <button
-                        onClick={() => handleOpenCalendar(bundle.name)}
+                        onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                         className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -904,7 +900,7 @@ export function Membership() {
                         CREATE MY OWN EXPERIENCE
                       </button>
                     </div>
-                    {currentDestination.boracayBundles?.map((bundle, index) => (
+                    {currentDestination.boracayBundles?.map((bundle: any, index: number) => (
                       <div
                         key={`boracay-${index}`}
                         className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -934,11 +930,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
                           </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -954,7 +946,7 @@ export function Membership() {
                           </div>
                         </div>
                         <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                          {bundle.includes.map((item, idx) => (
+                          {bundle.includes.map((item: any, idx: number) => (
                             <div key={idx} className="flex items-start gap-2 md:gap-3">
                               <Check className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                               <span className="text-slate-300 text-xs md:text-sm leading-relaxed">
@@ -964,7 +956,7 @@ export function Membership() {
                           ))}
                         </div>
                         <button 
-                          onClick={() => handleOpenCalendar(bundle.name)}
+                          onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                           className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -990,7 +982,7 @@ export function Membership() {
                         CREATE MY OWN EXPERIENCE
                       </button>
                     </div>
-                    {currentDestination.siargaoBundles?.map((bundle, index) => (
+                    {currentDestination.siargaoBundles?.map((bundle: any, index: number) => (
                       <div
                         key={`siargao-${index}`}
                         className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -1020,11 +1012,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
                           </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -1040,7 +1028,7 @@ export function Membership() {
                           </div>
                         </div>
                         <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                          {bundle.includes.map((item, idx) => (
+                          {bundle.includes.map((item: any, idx: number) => (
                             <div key={idx} className="flex items-start gap-2 md:gap-3">
                               <Check className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                               <span className="text-slate-300 text-xs md:text-sm leading-relaxed">
@@ -1050,7 +1038,7 @@ export function Membership() {
                           ))}
                         </div>
                         <button 
-                          onClick={() => handleOpenCalendar(bundle.name)}
+                          onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                           className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -1076,7 +1064,7 @@ export function Membership() {
                         CREATE MY OWN EXPERIENCE
                       </button>
                     </div>
-                    {currentDestination.palawanBundles?.map((bundle, index) => (
+                    {currentDestination.palawanBundles?.map((bundle: any, index: number) => (
                       <div
                         key={`palawan-${index}`}
                         className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -1106,11 +1094,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
                           </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -1126,7 +1110,7 @@ export function Membership() {
                           </div>
                         </div>
                         <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                          {bundle.includes.map((item, idx) => (
+                          {bundle.includes.map((item: any, idx: number) => (
                             <div key={idx} className="flex items-start gap-2 md:gap-3">
                               <Check className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                               <span className="text-slate-300 text-xs md:text-sm leading-relaxed">
@@ -1136,7 +1120,7 @@ export function Membership() {
                           ))}
                         </div>
                         <button 
-                          onClick={() => handleOpenCalendar(bundle.name)}
+                          onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                           className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -1174,7 +1158,7 @@ export function Membership() {
                 </div>
 
                 {currentDestination.phuketBundles.map(
-                  (bundle, index) => (
+                  (bundle: any, index: number) => (
                     <div
                       key={`phuket-${index}`}
                       className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -1210,11 +1194,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
 
                         <div className="mb-3 md:mb-4">
                           <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -1231,7 +1211,7 @@ export function Membership() {
                       </div>
 
                       <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                        {bundle.includes.map((item, idx) => (
+                        {bundle.includes.map((item: any, idx: number) => (
                           <div
                             key={idx}
                             className="flex items-start gap-2 md:gap-3"
@@ -1245,7 +1225,7 @@ export function Membership() {
                       </div>
 
                       <button
-                        onClick={() => handleOpenCalendar(bundle.name)}
+                        onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
                         className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
@@ -1267,7 +1247,7 @@ export function Membership() {
                 <div className="col-span-full relative min-h-[400px]">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 blur-sm pointer-events-none">
                     {currentDestination.bangkokBundles.map(
-                      (bundle, index) => (
+                      (bundle: any, index: number) => (
                         <div
                           key={`bangkok-${index}`}
                           className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -1304,11 +1284,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
                             </p>
 
                             <div className="mb-3 md:mb-4">
@@ -1327,7 +1303,7 @@ export function Membership() {
 
                           <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
                             {bundle.includes.map(
-                              (item, idx) => (
+                              (item: any, idx: number) => (
                                 <div
                                   key={idx}
                                   className="flex items-start gap-2 md:gap-3"
@@ -1393,7 +1369,7 @@ export function Membership() {
                 <div className="col-span-full relative min-h-[400px]">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 blur-sm pointer-events-none">
                     {currentDestination.pattayaBundles.map(
-                      (bundle, index) => (
+                      (bundle: any, index: number) => (
                         <div
                           key={`pattaya-${index}`}
                           className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
@@ -1430,11 +1406,7 @@ export function Membership() {
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-                        {index === 2 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/20 mb-4">
-                            🔥 Booked 37 times this month
-                          </div>
-                        )}
+
                             </p>
 
                             <div className="mb-3 md:mb-4">
@@ -1453,7 +1425,7 @@ export function Membership() {
 
                           <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
                             {bundle.includes.map(
-                              (item, idx) => (
+                              (item: any, idx: number) => (
                                 <div
                                   key={idx}
                                   className="flex items-start gap-2 md:gap-3"
@@ -1519,7 +1491,7 @@ export function Membership() {
 
       {/* Custom Experience Modal */}
       {showCustomExperience && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center p-4 overflow-y-auto custom-scrollbar">
           <div className="bg-slate-900 rounded-2xl max-w-7xl w-full my-4 relative max-h-[95vh] flex flex-col">
             <div className="bg-slate-900 border-b border-slate-700 p-4 rounded-t-2xl flex-shrink-0">
               <div className="flex items-center justify-between">
@@ -1539,7 +1511,7 @@ export function Membership() {
               </p>
             </div>
 
-            <div className="p-4 space-y-4 overflow-y-auto flex-1">
+            <div className="p-4 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
               {/* Yacht Hire */}
               <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <div className="flex items-center gap-2 mb-3">
@@ -1899,40 +1871,16 @@ export function Membership() {
                 </div>
               </div>
 
-              {/* Aviation Credit */}
-              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <div className="flex items-center gap-2 mb-3">
-                  <Plane className="w-6 h-6 text-cyan-400" />
-                  <h3 className="text-xl font-bold">
-                    Aviation Credit
-                  </h3>
-                </div>
-                <div className="grid md:grid-cols-1 gap-3 max-w-md">
-                  <button
-                    onClick={() =>
-                      toggleCustomSelection(
-                        "aviation",
-                        "Fixed Rate",
-                        349,
-                      )
-                    }
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      customSelections["aviation-Fixed Rate"]
-                        ? "border-cyan-500 bg-cyan-500/20"
-                        : "border-slate-600 hover:border-slate-500"
-                    }`}
-                  >
-                    <div className="font-semibold text-sm">
-                      Fixed Rate
-                    </div>
-                    <div className="text-cyan-400 text-lg font-bold mt-1">
-                      $349
-                    </div>
-                    <div className="text-xs text-slate-400 mt-1">
-                      Helicopter transfers starting from $349
-                    </div>
-                  </button>
-                </div>
+              {/* Aviation Credit Maps */}
+              <div className="mt-8 mb-4">
+                <AviationMap 
+                  selectedRouteId={
+                    Object.keys(customSelections).find(k => k.startsWith("aviation-"))?.replace("aviation-", "")
+                  }
+                  onSelectRoute={(route) => {
+                    toggleCustomSelection("aviation", route.id, route.price);
+                  }}
+                />
               </div>
             </div>
 
@@ -1948,7 +1896,7 @@ export function Membership() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => handleOpenCalendar("Custom Experience")}
+                  onClick={() => handleOpenCalendar("Custom Experience", "")}
                   className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all">
                   Book My Experience
                 </button>
@@ -2023,7 +1971,7 @@ export function Membership() {
           
           <div className="text-center">
             <button 
-              onClick={() => handleOpenCalendar("Custom Quote / Enhanced Experience")}
+              onClick={() => handleOpenCalendar("Custom Quote / Enhanced Experience", "")}
               className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-slate-900 font-bold rounded-full hover:from-yellow-400 hover:to-yellow-500 transition-all text-lg shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]">
               Request a Custom Quote
             </button>

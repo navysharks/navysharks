@@ -113,42 +113,6 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
   }
 });
 
-router.post('/create-prive-checkout-session', verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.uid;
-    const userEmail = req.user.email || req.body.userEmail;
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Navy Sharks Privé Membership',
-              description: 'Annual recurring membership for VIP access and concierge services.',
-            },
-            unit_amount: 49000, // $490.00
-            recurring: { interval: 'year' },
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      client_reference_id: userId,
-      customer_email: userEmail,
-      metadata: {
-        type: 'prive_membership',
-      },
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/?canceled=true`,
-    });
-
-    res.json({ id: session.id, url: session.url });
-  } catch (error) {
-    console.error('Error creating Privé checkout session:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
 
 module.exports = router;
