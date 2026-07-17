@@ -59,7 +59,7 @@ export function Destinations() {
       highlights: [
         "Sukhumvit Road nightlife and dining scene",
         "Luxury beach clubs and yacht charters",
-        "Five-star accommodations at incredible prices",
+        "Luxury accommodations at incredible prices",
         "World-renowned Thai cuisine and hospitality",
       ],
     },

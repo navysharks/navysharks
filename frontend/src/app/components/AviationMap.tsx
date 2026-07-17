@@ -94,6 +94,12 @@ export function AviationMap({ onSelectRoute, selectedRouteId }: { onSelectRoute:
   const selectedRoute = ROUTES.find(r => r.id === selectedRouteId);
 
   useEffect(() => {
+    // Force a resize slightly after mount to fix the issue where the map 
+    // renders incorrectly if the modal is still animating its open state
+    const timer = setTimeout(() => {
+      mapRef.current?.resize();
+    }, 300);
+    
     if (selectedRoute && mapRef.current) {
       const [start, end] = selectedRoute.coordinates;
       // Simple bounds calculation
@@ -103,11 +109,16 @@ export function AviationMap({ onSelectRoute, selectedRouteId }: { onSelectRoute:
       const maxLat = Math.max(start[1], end[1]);
 
       mapRef.current.fitBounds(
-        [[minLng, minLat], [maxLng, maxLat]],
-        { padding: 80, duration: 2000, maxZoom: 11 }
+        [
+          [minLng, minLat],
+          [maxLng, maxLat]
+        ],
+        { padding: 50, duration: 2000 }
       );
     }
-  }, [selectedRouteId]);
+    
+    return () => clearTimeout(timer);
+  }, [selectedRoute]);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full mt-4">
@@ -179,6 +190,7 @@ export function AviationMap({ onSelectRoute, selectedRouteId }: { onSelectRoute:
           {...viewState}
           onMove={evt => setViewState(evt.viewState)}
           mapStyle={MAP_STYLE}
+          style={{ width: '100%', height: '100%' }}
           attributionControl={false}
           renderWorldCopies={false}
         >
