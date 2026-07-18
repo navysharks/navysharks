@@ -39,7 +39,7 @@ export function EliteMembershipModal({
 
     try {
       const token = await user.getIdToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/identity/create-verification-session`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://us-central1-navysharks.cloudfunctions.net/api'}/api/identity/create-verification-session`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

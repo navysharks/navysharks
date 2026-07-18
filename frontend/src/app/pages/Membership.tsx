@@ -88,7 +88,7 @@ export function Membership() {
     
     try {
       const token = await user.getIdToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payment/create-checkout-session`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://us-central1-navysharks.cloudfunctions.net/api'}/api/payment/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -171,7 +171,7 @@ export function Membership() {
 
     try {
       const token = await user.getIdToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payment/create-bundle-checkout-session`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://us-central1-navysharks.cloudfunctions.net/api'}/api/payment/create-bundle-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
