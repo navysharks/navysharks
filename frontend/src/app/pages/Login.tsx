@@ -21,8 +21,15 @@ export function Login() {
       toast.success("Welcome back to Navy Sharks!");
       navigate("/dashboard");
     } catch (error: any) {
-      console.error("Login error:", error);
-      toast.error(error.message || "Failed to log in. Please check your credentials.");
+      let errorMessage = "Failed to log in. Please check your credentials.";
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+        errorMessage = "Incorrect email or password.";
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = "Too many attempts. Please try again later.";
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = "This account has been disabled.";
+      }
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

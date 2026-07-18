@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 let app;
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || './serviceAccountKey.json';
+const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH || './serviceAccountKey.json';
 
 try {
   if (fs.existsSync(serviceAccountPath)) {
@@ -13,7 +13,7 @@ try {
     app = initializeApp({
       credential: cert(serviceAccount),
     });
-    console.log('Firebase Admin SDK initialized successfully.');
+    // Firebase Admin SDK initialized
   } else {
     console.warn(`[WARNING] Firebase Service Account Key not found at ${serviceAccountPath}. Database features will not work until this is provided.`);
     app = initializeApp();
@@ -22,7 +22,7 @@ try {
   console.error('Error initializing Firebase Admin:', error);
 }
 
-const db = getFirestore(app);
+const db = getFirestore(app, "default");
 const auth = getAuth(app);
 
 module.exports = { db, auth };

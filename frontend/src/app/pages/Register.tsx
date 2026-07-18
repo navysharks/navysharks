@@ -38,8 +38,15 @@ export function Register() {
       toast.success("Account created successfully!");
       navigate("/dashboard");
     } catch (error: any) {
-      console.error("Registration error:", error);
-      toast.error(error.message || "Failed to create account.");
+      let errorMessage = "Failed to create account. Please try again.";
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "An account with this email already exists.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Password is too weak. Please use at least 6 characters.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Please enter a valid email address.";
+      }
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

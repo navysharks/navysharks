@@ -38,9 +38,13 @@ export function EliteMembershipModal({
     toast.loading("Preparing secure verification...", { id: "identity" });
 
     try {
-      const response = await fetch("http://localhost:5000/api/identity/create-verification-session", {
+      const token = await user.getIdToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/identity/create-verification-session`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ userId: user.uid }),
       });
 
@@ -149,7 +153,7 @@ export function EliteMembershipModal({
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Gender *</label>
                     <select required className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-yellow-500 transition-colors appearance-none">
-                      <option value="" disabled selected>Select Gender</option>
+                      <option value="" disabled>Select Gender</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>

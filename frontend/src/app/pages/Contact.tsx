@@ -30,12 +30,26 @@ export function Contact() {
   });
 
   const onSubmit = async (data: ContactFormValues) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    toast.success("Message sent successfully!", {
-      description: "We'll get back to you within 24 hours.",
-    });
-    reset();
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/contact`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed to send message");
+      toast.success("Message sent successfully!", {
+        description: "We'll get back to you within 24 hours.",
+      });
+      reset();
+    } catch (error: any) {
+      toast.error("Failed to send message", {
+        description: error.message || "Please try again later.",
+      });
+    }
   };
 
   return (

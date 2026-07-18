@@ -69,7 +69,7 @@ export function Home() {
       <section className="bg-slate-950">
         {/* Title Above Video */}
         <div className="container mx-auto px-4 py-12 text-center">
-          <h1 className="text-5xl md:text-7xl mb-4 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent tracking-wider" style={{ fontFamily: "'Pompei New Bold', serif", fontWeight: 'bold', letterSpacing: '0.15em' }}>
+          <h1 className="text-5xl md:text-7xl mb-4 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent tracking-wider" style={{ fontFamily: "'Cinzel', serif", fontWeight: 'bold', letterSpacing: '0.15em' }}>
             NAVY SHARKS
           </h1>
           <h2 className="text-2xl md:text-4xl font-semibold text-white">

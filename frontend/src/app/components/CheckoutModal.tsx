@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { X, User, Mail, Phone, Camera, CreditCard, CheckCircle2, ScanFace, Upload } from "lucide-react";
+import { X, User, Mail, Phone, Camera, CreditCard, CheckCircle2, ScanFace, Upload, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface CheckoutModalProps {
   selectedDate: Date | null;
   bundleName: string;
   bundlePrice: string;
+  userToken: string | null;
 }
 
 export function CheckoutModal({
@@ -17,6 +19,7 @@ export function CheckoutModal({
   selectedDate,
   bundleName,
   bundlePrice,
+  userToken,
 }: CheckoutModalProps) {
   const [step, setStep] = useState<"details" | "addons" | "verification">("details");
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
@@ -29,7 +32,7 @@ export function CheckoutModal({
   ];
 
   const toggleAddon = (id: string) => {
-    setSelectedAddons(prev => 
+    setSelectedAddons(prev =>
       prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
     );
   };
@@ -43,12 +46,36 @@ export function CheckoutModal({
     setStep("verification");
   };
 
-  const simulateStripeIdentity = () => {
+  const handleStartVerification = async () => {
+    if (!userToken) {
+      toast.error("Session expired. Please log in again.");
+      return;
+    }
     setVerificationStatus("scanning");
-    setTimeout(() => {
-      setVerificationStatus("success");
-    }, 2500);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/identity/create-verification-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.url) {
+        // Redirect to Stripe Identity verification page
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || "Failed to start verification");
+      }
+    } catch (error: any) {
+      toast.error("Verification failed: " + error.message);
+      setVerificationStatus("pending");
+    }
   };
+
 
   if (!isOpen) return null;
 
@@ -266,11 +293,16 @@ export function CheckoutModal({
                       </div>
                       <div className="ml-auto">
                         {verificationStatus === 'pending' && (
-                          <button 
-                            onClick={simulateStripeIdentity}
+                          <button
+                            onClick={handleStartVerification}
                             className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-lg text-sm font-bold transition-colors">
-                            <Camera className="w-4 h-4" /> Start Scan
+                            <Camera className="w-4 h-4" /> Start Verification
                           </button>
+                        )}
+                        {verificationStatus === 'scanning' && (
+                          <div className="flex items-center gap-2 text-cyan-400 text-sm">
+                            <Loader2 className="w-4 h-4 animate-spin" /> Redirecting...
+                          </div>
                         )}
                       </div>
                     </div>
@@ -298,10 +330,16 @@ export function CheckoutModal({
                   <div className="flex justify-between text-base font-bold pt-3 border-t border-slate-800">
                     <span className="text-white">Total Estimate</span>
                     <span className="text-cyan-400 font-mono">
-                      ${parseInt(bundlePrice.replace(/[^0-9]/g, ''), 10) + selectedAddons.reduce((sum, id) => {
-                        const addon = addonsList.find(a => a.id === id);
-                        return sum + (addon ? addon.price : 0);
-                      }, 0)}
+                      {(() => {
+                        const safePrice = bundlePrice || "";
+                        const basePrice = parseInt(safePrice.replace(/[^0-9]/g, '') || "0", 10);
+                        const addonsTotal = selectedAddons.reduce((sum, id) => {
+                          const addon = addonsList.find(a => a.id === id);
+                          return sum + (addon ? addon.price : 0);
+                        }, 0);
+                        if (basePrice > 0) return `$${(basePrice + addonsTotal).toLocaleString()}`;
+                        return addonsTotal > 0 ? `Custom + $${addonsTotal.toLocaleString()}` : 'Custom';
+                      })()}
                     </span>
                   </div>
                 </div>

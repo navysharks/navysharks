@@ -23,7 +23,8 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    const payload = req.rawBody || req.body;
+    event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
   } catch (err) {
     console.error(`Webhook Error: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -58,7 +59,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
               amountPaid: session.amount_total,
               stripeSessionId: session.id
             });
-            console.log(`Successfully recorded bundle booking for user ${userId}!`);
+            // Bundle booking recorded successfully
 
             // Send confirmation email
             const customerEmail = session.customer_details ? session.customer_details.email : null;
@@ -82,7 +83,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
                     </div>
                   `
                 });
-                console.log(`Sent confirmation email to ${customerEmail}`);
+                // Confirmation email sent
               } catch (emailError) {
                 console.error("Error sending confirmation email:", emailError);
               }
@@ -95,7 +96,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
               stripeSessionId: session.id,
               stripeCustomerId: session.customer,
             }, { merge: true });
-            console.log(`Successfully upgraded user ${userId} to Elite Member!`);
+            // User upgraded to Elite Member
           }
         } catch (dbError) {
           console.error('Error updating Firestore:', dbError);
@@ -107,7 +108,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
       
     // Handle other event types if necessary
     default:
-      console.log(`Unhandled event type ${event.type}`);
+      // Unhandled event type — ignored
   }
 
   // Return a 200 response to acknowledge receipt of the event

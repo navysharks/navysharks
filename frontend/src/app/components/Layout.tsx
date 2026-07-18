@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation } from "react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 export function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -161,8 +162,10 @@ export function Layout() {
       </header>
 
       {/* Main Content */}
-      <main className="pt-32">
-        <Outlet />
+      <main className="flex-1 pt-20">
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

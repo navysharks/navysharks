@@ -14,22 +14,24 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
-import { experiencesComingSoonBackgrounds } from "../comingSoonBackgrounds";
 import { BookingCalendarModal } from "../components/BookingCalendarModal";
 import { AviationMap } from "../components/AviationMap";
 import { CheckoutModal } from "../components/CheckoutModal";
 import { EliteMembershipModal } from "../components/EliteMembershipModal";
+import { destinations } from "../data/membershipData";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useSearchParams } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState as useReactState } from "react";
 
 export function Membership() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showRFID, setShowRFID] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedDestination, setSelectedDestination] =
@@ -46,6 +48,18 @@ export function Membership() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
   const [currency, setCurrency] = useState<"USD" | "GBP" | "AUD">("USD");
+  const [userToken, setUserToken] = useState<string | null>(null);
+
+  // Fetch token when checkout modal opens
+  const handleOpenCalendarWithToken = async (bundleName: string, price: string) => {
+    if (user) {
+      const token = await user.getIdToken();
+      setUserToken(token);
+    }
+    setSelectedBundleForCalendar(bundleName);
+    setSelectedBundlePrice(price);
+    setIsCalendarOpen(true);
+  };
 
   const formatPrice = (priceStr: string) => {
     const rawPrice = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
@@ -62,7 +76,7 @@ export function Membership() {
     return priceStr; // Default USD
   };
 
-  const handleEliteCheckoutComplete = async () => {
+  const handleEliteCheckoutComplete = async (verificationSessionId?: string) => {
     if (!user) {
       toast.error("Please login to proceed with Elite Membership");
       navigate("/login");
@@ -82,6 +96,7 @@ export function Membership() {
         },
         body: JSON.stringify({
           userEmail: user.email,
+          verificationSessionId: verificationSessionId,
         })
       });
 
@@ -103,25 +118,31 @@ export function Membership() {
   useEffect(() => {
     const sessionId = searchParams.get("verification_session_id");
     if (sessionId && user) {
-      // User just returned from Stripe Identity
-      // In a real app we might fetch the verification status from backend
-      // But for this demo, we assume they completed it and proceed to payment
-      handleEliteCheckoutComplete();
+      // Pass the real verification session ID to the backend for server-side validation
+      handleEliteCheckoutComplete(sessionId);
       
-      // Clean up the URL
-      searchParams.delete("verification_session_id");
-      navigate("/membership", { replace: true });
+      // Clean up the URL correctly using setSearchParams
+      setSearchParams(prev => {
+        prev.delete("verification_session_id");
+        return prev;
+      }, { replace: true });
     }
 
     const joinParam = searchParams.get("join");
     if (joinParam === "true") {
       setIsEliteModalOpen(true);
-      searchParams.delete("join");
-      navigate("/membership", { replace: true });
+      setSearchParams(prev => {
+        prev.delete("join");
+        return prev;
+      }, { replace: true });
     }
-  }, [searchParams, user, navigate]);
+  }, [searchParams, user, setSearchParams]);
 
-  const handleOpenCalendar = (bundleName: string, price: string) => {
+  const handleOpenCalendar = async (bundleName: string, price: string) => {
+    if (user) {
+      const token = await user.getIdToken();
+      setUserToken(token);
+    }
     setSelectedBundleForCalendar(bundleName);
     setSelectedBundlePrice(price);
     setIsCalendarOpen(true);
@@ -180,14 +201,33 @@ export function Membership() {
     }
   };
 
+  const [rfidCode, setRfidCode] = useReactState<string | null>(null);
+
   const generateRFID = async () => {
+    if (!user) return;
     setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setShowRFID(true);
-    setIsGenerating(false);
-    toast.success("RFID Code Generated!", {
-      description: "Your demo RFID code is ready.",
-    });
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+      const existingCode = userDoc.data()?.rfidCode;
+
+      if (existingCode) {
+        setRfidCode(existingCode);
+      } else {
+        const newCode = `NS-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
+        await setDoc(userDocRef, { rfidCode: newCode }, { merge: true });
+        setRfidCode(newCode);
+      }
+      setShowRFID(true);
+      toast.success("RFID Code Generated!", {
+        description: "Your unique RFID code is ready.",
+      });
+    } catch (error) {
+      console.error("Error generating RFID:", error);
+      toast.error("Failed to generate RFID code.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const toggleCustomSelection = (
@@ -227,470 +267,17 @@ export function Membership() {
     );
   };
 
-  const mockRFIDCode =
-    "NS-" +
-    Math.random().toString(36).substr(2, 9).toUpperCase();
+  // RFID code is now generated and stored in Firestore via generateRFID()
 
-  const destinations = {
-    thailand: {
-      name: "Thailand",
-      location:
-        "Phuket • Bangkok (Coming Soon) • Pattaya (Coming Soon)",
-      comingSoon: false,
-      comingSoonImage: "",
-      bangkokBundles: [
-        {
-          name: "VIP Weekend Access",
-          price: "$980",
-          nights: "3 Nights",
-          description: "Perfect for elevated weekend escapes",
-          includes: [
-            "3-night luxury hotel stay",
-            "$100 curated dining credit",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "Dedicated concierge support",
-          ],
-          value: "$1,450",
-          popular: false,
-        },
-        {
-          name: "Luxe Escape Experience",
-          price: "$1,290",
-          nights: "4 Nights",
-          description: "The complete Bangkok experience",
-          includes: [
-            "4-night riverfront 5-star stay",
-            "Daily breakfast included",
-            "$200 curated dining credit",
-            "VIP nightclub access +1 entry",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "24/7 concierge WhatsApp support",
-          ],
-          value: "$1,950",
-          popular: true,
-        },
-        {
-          name: "Yacht & River Elite",
-          price: "$1,650",
-          nights: "3 Nights",
-          description:
-            "Private river cruise with rooftop nightlife",
-          includes: [
-            "3-night premium riverfront hotel stay",
-            "Half-day private river yacht (up to 8 guests)",
-            "Complimentary bottle (exclusive requested bottle is subject to approval)",
-            "$100 transport credit",
-            "Security credit",
-            "Private transfers",
-            "Concierge planning service",
-          ],
-          value: "$2,500",
-          popular: false,
-        },
-      ],
-      pattayaBundles: [
-        {
-          name: "VIP Weekend Access",
-          price: "$980",
-          nights: "3 Nights",
-          description:
-            "Perfect for elevated beach weekend escapes",
-          includes: [
-            "3-night luxury hotel stay",
-            "$100 curated dining credit",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "Dedicated concierge support",
-          ],
-          value: "$1,450",
-          popular: false,
-        },
-        {
-          name: "Luxe Escape Experience",
-          price: "$1,290",
-          nights: "4 Nights",
-          description: "The complete Pattaya beach experience",
-          includes: [
-            "4-night sea view stay",
-            "Daily breakfast included",
-            "$200 curated dining credit",
-            "VIP nightclub access +1 entry",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "24/7 concierge WhatsApp support",
-          ],
-          value: "$1,950",
-          popular: true,
-        },
-        {
-          name: "Yacht & Island Elite",
-          price: "$1,650",
-          nights: "3 Nights",
-          description:
-            "Private island hopping with yacht experience",
-          includes: [
-            "3-night beachfront hotel stay",
-            "Half-day private yacht island tour (up to 8 guests)",
-            "Complimentary bottle (exclusive requested bottle is subject to approval)",
-            "$100 transport credit",
-            "Security credit",
-            "Private transfers",
-            "Concierge planning service",
-          ],
-          value: "$2,500",
-          popular: false,
-        },
-      ],
-      phuketBundles: [
-        {
-          name: "VIP Weekend Access",
-          price: "$980",
-          nights: "3 Nights",
-          description:
-            "Perfect for elevated island weekend escapes",
-          includes: [
-            "3-night luxury hotel stay",
-            "$100 curated dining credit",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "Dedicated concierge support",
-          ],
-          value: "$1,450",
-          popular: false,
-        },
-        {
-          name: "Luxe Escape Experience",
-          price: "$1,290",
-          nights: "4 Nights",
-          description: "The complete Phuket island experience",
-          includes: [
-            "4-night sea view stay",
-            "Daily breakfast included",
-            "$200 curated dining credit",
-            "VIP nightclub access +1 entry",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "24/7 concierge WhatsApp support",
-          ],
-          value: "$1,950",
-          popular: true,
-        },
-        {
-          name: "Yacht & Island Elite",
-          price: "$1,650",
-          nights: "3 Nights",
-          description:
-            "Private island hopping with yacht experience",
-          includes: [
-            "3-night beachfront hotel stay",
-            "Half-day private yacht island hopping (up to 8 guests)",
-            "Complimentary bottle (exclusive requested bottle is subject to approval)",
-            "$100 transport credit",
-            "Security credit",
-            "Private transfers",
-            "Concierge planning service",
-          ],
-          value: "$2,500",
-          popular: false,
-        },
-      ],
-    },
-    philippines: {
-      name: "Philippines",
-      location: "Boracay • Siargao • Palawan",
-      comingSoon: false,
-      comingSoonImage: "",
-      boracayBundles: [
-        {
-          name: "VIP Weekend Access",
-          price: "$980",
-          nights: "3 Nights",
-          description: "Perfect for elevated island escapes",
-          includes: [
-            "3-night luxury hotel stay",
-            "$100 curated dining credit",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "Dedicated concierge support",
-          ],
-          value: "$1,450",
-          popular: false,
-        },
-        {
-          name: "Luxe Escape Experience",
-          price: "$1,290",
-          nights: "4 Nights",
-          description: "The complete island luxury experience",
-          includes: [
-            "4-night sea view stay",
-            "Daily breakfast included",
-            "$200 curated dining credit",
-            "VIP nightclub access +1 entry",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "24/7 concierge WhatsApp support",
-          ],
-          value: "$1,950",
-          popular: true,
-        },
-        {
-          name: "Yacht & Island Elite",
-          price: "$1,650",
-          nights: "3 Nights",
-          description: "Premium island hopping experience",
-          includes: [
-            "3-night beachfront hotel stay",
-            "Half-day private yacht/boat tour",
-            "Complimentary bottle (exclusive requested bottle is subject to approval)",
-            "$100 transport credit",
-            "Security credit",
-            "Private transfers",
-            "Concierge planning service",
-          ],
-          value: "$2,500",
-          popular: false,
-        },
-      ],
-      siargaoBundles: [
-        {
-          name: "VIP Weekend Access",
-          price: "$980",
-          nights: "3 Nights",
-          description: "Perfect for elevated island escapes",
-          includes: [
-            "3-night luxury hotel stay",
-            "$100 curated dining credit",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "Dedicated concierge support",
-          ],
-          value: "$1,450",
-          popular: false,
-        },
-        {
-          name: "Luxe Escape Experience",
-          price: "$1,290",
-          nights: "4 Nights",
-          description: "The complete island luxury experience",
-          includes: [
-            "4-night sea view stay",
-            "Daily breakfast included",
-            "$200 curated dining credit",
-            "VIP nightclub access +1 entry",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "24/7 concierge WhatsApp support",
-          ],
-          value: "$1,950",
-          popular: true,
-        },
-        {
-          name: "Yacht & Island Elite",
-          price: "$1,650",
-          nights: "3 Nights",
-          description: "Premium island hopping experience",
-          includes: [
-            "3-night beachfront hotel stay",
-            "Half-day private yacht/boat tour",
-            "Complimentary bottle (exclusive requested bottle is subject to approval)",
-            "$100 transport credit",
-            "Security credit",
-            "Private transfers",
-            "Concierge planning service",
-          ],
-          value: "$2,500",
-          popular: false,
-        },
-      ],
-      palawanBundles: [
-        {
-          name: "VIP Weekend Access",
-          price: "$980",
-          nights: "3 Nights",
-          description: "Perfect for elevated island escapes",
-          includes: [
-            "3-night luxury hotel stay",
-            "$100 curated dining credit",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "Dedicated concierge support",
-          ],
-          value: "$1,450",
-          popular: false,
-        },
-        {
-          name: "Luxe Escape Experience",
-          price: "$1,290",
-          nights: "4 Nights",
-          description: "The complete island luxury experience",
-          includes: [
-            "4-night sea view stay",
-            "Daily breakfast included",
-            "$200 curated dining credit",
-            "VIP nightclub access +1 entry",
-            "$100 transport credit",
-            "Security credit",
-            "Private airport transfers",
-            "24/7 concierge WhatsApp support",
-          ],
-          value: "$1,950",
-          popular: true,
-        },
-        {
-          name: "Yacht & Island Elite",
-          price: "$1,650",
-          nights: "3 Nights",
-          description: "Premium island hopping experience",
-          includes: [
-            "3-night beachfront hotel stay",
-            "Half-day private yacht/boat tour",
-            "Complimentary bottle (exclusive requested bottle is subject to approval)",
-            "$100 transport credit",
-            "Security credit",
-            "Private transfers",
-            "Concierge planning service",
-          ],
-          value: "$2,500",
-          popular: false,
-        },
-      ],
-    },
-    colombia: {
-      name: "Colombia",
-      location: "Medellín • Cartagena • Bogotá",
-      comingSoon: true,
-      comingSoonImage:
-        experiencesComingSoonBackgrounds.colombia,
-      bundles: [
-        {
-          name: "Medellín Lifestyle Weekend",
-          price: "$780",
-          nights: "3 Nights",
-          description: "City of eternal spring experience",
-          includes: [
-            "3-night El Poblado boutique hotel",
-            "Rooftop pool & bar access",
-            "VIP nightclub entry",
-            "Guided nightlife tour",
-            "Private transfers",
-            "Concierge support",
-          ],
-          value: "$1,200",
-          popular: false,
-        },
-        {
-          name: "Cartagena Luxe Escape",
-          price: "$1,150",
-          nights: "4 Nights",
-          description: "Caribbean coast luxury experience",
-          includes: [
-            "4-night walled city boutique hotel",
-            "$180 dining credit",
-            "Beach club day pass",
-            "VIP rooftop lounge access",
-            "Old city walking tour",
-            "Private car service",
-            "24/7 concierge WhatsApp",
-          ],
-          value: "$1,800",
-          popular: true,
-        },
-        {
-          name: "Caribbean Yacht Experience",
-          price: "$1,550",
-          nights: "3 Nights",
-          description: "Private yacht & colonial luxury",
-          includes: [
-            "3-night luxury hotel",
-            "Private yacht charter (8 guests)",
-            "Rosario Islands cruise",
-            "Beach club access",
-            "VIP nightclub reservations",
-            "Professional photographer",
-            "Premium concierge service",
-          ],
-          value: "$2,400",
-          popular: false,
-        },
-      ],
-    },
-    brazil: {
-      name: "Brazil",
-      location: "Rio • São Paulo • Florianópolis",
-      comingSoon: true,
-      comingSoonImage: experiencesComingSoonBackgrounds.brazil,
-      bundles: [
-        {
-          name: "Rio Beach & Night",
-          price: "$920",
-          nights: "3 Nights",
-          description: "Copacabana lifestyle experience",
-          includes: [
-            "3-night Copacabana hotel",
-            "Beach club access",
-            "2 VIP nightclub entries",
-            "Sunset at Ipanema tour",
-            "Private transfers",
-            "Concierge support",
-          ],
-          value: "$1,400",
-          popular: false,
-        },
-        {
-          name: "São Paulo Luxe Experience",
-          price: "$1,250",
-          nights: "4 Nights",
-          description: "Urban sophistication meets nightlife",
-          includes: [
-            "4-night Jardins luxury hotel",
-            "$220 fine dining credit",
-            "2 VIP club reservations",
-            "Rooftop pool access",
-            "Art gallery tour",
-            "Private car service",
-            "24/7 concierge support",
-          ],
-          value: "$1,900",
-          popular: true,
-        },
-        {
-          name: "Beach Yacht Elite",
-          price: "$1,750",
-          nights: "3 Nights",
-          description: "Private yacht on Brazil's coast",
-          includes: [
-            "3-night beachfront resort",
-            "Full-day private yacht (10 guests)",
-            "Island hopping expedition",
-            "Beach club VIP access",
-            "Caipirinha masterclass",
-            "Professional photography",
-            "Premium concierge",
-          ],
-          value: "$2,700",
-          popular: false,
-        },
-      ],
-    },
-  };
+  // Destinations data is imported from ../data/membershipData.ts
+  // Edit pricing, bundles, and descriptions there without touching this file.
 
   const currentDestination: any =
     destinations[
       selectedDestination as keyof typeof destinations
     ];
+
+
 
   return (
     <div className="bg-slate-950 text-white min-h-screen">
@@ -750,6 +337,9 @@ export function Membership() {
               </button>
             ))}
           </div>
+          <p className="text-xs text-slate-500 mt-3 text-center">
+            * Exchange rates are approximate. Final charge will be in USD.
+          </p>
         </div>
       </section>
 
@@ -922,16 +512,13 @@ export function Membership() {
                             {bundle.nights}
                           </p>
                           <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          {bundle.description}
-                        </p>
+                            {bundle.description}
+                          </p>
                         {index === 1 && (
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-
-                          </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
                               Retail Value: {formatPrice(bundle.value)}
@@ -1004,16 +591,13 @@ export function Membership() {
                             {bundle.nights}
                           </p>
                           <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          {bundle.description}
-                        </p>
+                            {bundle.description}
+                          </p>
                         {index === 1 && (
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-
-                          </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
                               Retail Value: {formatPrice(bundle.value)}
@@ -1086,16 +670,13 @@ export function Membership() {
                             {bundle.nights}
                           </p>
                           <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          {bundle.description}
-                        </p>
+                            {bundle.description}
+                          </p>
                         {index === 1 && (
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
                             🇬🇧 Popular among UK travelers
                           </div>
                         )}
-
-                          </p>
                           <div className="mb-3 md:mb-4">
                             <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
                               Retail Value: {formatPrice(bundle.value)}
@@ -1276,16 +857,13 @@ export function Membership() {
                               {bundle.nights}
                             </p>
                             <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                            <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          {bundle.description}
-                        </p>
-                        {index === 1 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
-                            🇬🇧 Popular among UK travelers
-                          </div>
-                        )}
-
+                              {bundle.description}
                             </p>
+                            {index === 1 && (
+                              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                                🇬🇧 Popular among UK travelers
+                              </div>
+                            )}
 
                             <div className="mb-3 md:mb-4">
                               <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -1398,16 +976,13 @@ export function Membership() {
                               {bundle.nights}
                             </p>
                             <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                            <p className="text-slate-300 text-sm mb-3 md:mb-4">
-                          {bundle.description}
-                        </p>
-                        {index === 1 && (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
-                            🇬🇧 Popular among UK travelers
-                          </div>
-                        )}
-
+                              {bundle.description}
                             </p>
+                            {index === 1 && (
+                              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20 mb-4">
+                                🇬🇧 Popular among UK travelers
+                              </div>
+                            )}
 
                             <div className="mb-3 md:mb-4">
                               <div className="text-xs md:text-sm text-slate-400 line-through mb-1">
@@ -2235,7 +1810,7 @@ export function Membership() {
                         Generating...
                       </>
                     ) : (
-                      "Generate Demo RFID Code"
+                      "Generate RFID Code"
                     )}
                   </button>
                 ) : (
@@ -2245,7 +1820,7 @@ export function Membership() {
                         Your Unique RFID Code:
                       </p>
                       <p className="text-2xl font-mono font-bold text-cyan-400">
-                        {mockRFIDCode}
+                        {rfidCode || "Generating..."}
                       </p>
                     </div>
                     <p className="text-sm text-slate-400">
@@ -2338,6 +1913,7 @@ export function Membership() {
         selectedDate={selectedDate}
         bundleName={selectedBundleForCalendar}
         bundlePrice={selectedBundlePrice}
+        userToken={userToken}
       />
 
       {/* Elite Membership Modal */}

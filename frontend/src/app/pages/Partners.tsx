@@ -286,7 +286,13 @@ export function Partners() {
                     </div>
                     
                     {isElite && (
-                      <button className="w-full mt-5 py-2.5 bg-slate-800 hover:bg-cyan-600 hover:text-white text-cyan-400 text-sm font-bold rounded-lg transition-colors">
+                      <button
+                        onClick={() => {
+                          const message = encodeURIComponent(`Hi Navy Sharks Concierge, I'd like to request a booking at ${partner.name} (${partner.location}). Please assist me with availability and details. Thank you!`);
+                          window.open(`https://wa.me/?text=${message}`, '_blank');
+                        }}
+                        className="w-full mt-5 py-2.5 bg-slate-800 hover:bg-cyan-600 hover:text-white text-cyan-400 text-sm font-bold rounded-lg transition-colors"
+                      >
                         Request Booking
                       </button>
                     )}

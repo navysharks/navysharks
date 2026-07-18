@@ -70,8 +70,7 @@ export function ConciergeChatModal({
       createdAt: serverTimestamp(),
     });
 
-    // Bot Auto-Reply Logic for testing
-    // In a real app, a cloud function or real concierge would reply
+    // Automated acknowledgment — concierge team responds via admin dashboard
     setTimeout(async () => {
       await addDoc(messagesRef, {
         text: "Thank you for reaching out. A dedicated lifestyle manager is reviewing your request and will assist you shortly.",

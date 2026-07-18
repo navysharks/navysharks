@@ -8,9 +8,30 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
     // Use the authenticated user's UID instead of trusting the request body
     const userId = req.user.uid;
     const userEmail = req.user.email || req.body.userEmail;
+    const { verificationSessionId } = req.body;
+
+    // --- Server-side Identity Verification Check ---
+    // A verificationSessionId is REQUIRED. Without it, we cannot confirm the user
+    // completed a real Stripe Identity check.
+    if (!verificationSessionId) {
+      return res.status(403).json({ 
+        error: 'Identity verification is required before purchasing Elite Membership.' 
+      });
+    }
+
+    // Retrieve the session from Stripe to confirm its real status.
+    // This prevents URL spoofing (e.g. ?verification_session_id=fake).
+    const verificationSession = await stripe.identity.verificationSessions.retrieve(verificationSessionId);
+
+    if (verificationSession.status !== 'verified') {
+      return res.status(403).json({ 
+        error: `Identity verification was not completed successfully. Status: ${verificationSession.status}. Please complete the verification process.` 
+      });
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      allow_promotion_codes: true,
       line_items: [
         {
           price_data: {
@@ -92,6 +113,7 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      allow_promotion_codes: true,
       line_items: line_items,
       mode: 'payment',
       client_reference_id: userId,

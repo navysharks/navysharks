@@ -2,17 +2,17 @@ import { useNavigate, Link } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { Shield, MessageCircle, Star, MapPin, Users, Crown, CalendarDays, ScanLine, X, Loader2, Wallet, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { toast } from "sonner";
 import { ConciergeChatModal } from "../components/ConciergeChatModal";
+import logoUrl from "../../assets/logo.png";
 
 export function Dashboard() {
   const { user, userData } = useAuth();
   const navigate = useNavigate();
 
-  if (!user) return null; // ProtectedRoute handles redirect
-
+  // All hooks must be declared before any conditional returns (React Rules of Hooks)
   const [bookings, setBookings] = useState<any[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [showRFID, setShowRFID] = useState(false);
@@ -22,18 +22,40 @@ export function Dashboard() {
   const [tripCredits, setTripCredits] = useState(0);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showChatModal, setShowChatModal] = useState(false);
+  const [promoCode, setPromoCode] = useState<string | null>(null);
+
+
 
   const handleShowRFID = async () => {
     setShowRFID(true);
     if (!rfidCode) {
       setIsGenerating(true);
-      await new Promise(r => setTimeout(r, 1500));
-      setRfidCode(`NS-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
-      setIsGenerating(false);
+      try {
+        // Check if RFID code already exists in Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        const existingCode = userDoc.data()?.rfidCode;
+
+        if (existingCode) {
+          setRfidCode(existingCode);
+        } else {
+          // Generate new code and save it permanently to Firestore
+          const newCode = `NS-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+          await setDoc(userDocRef, { rfidCode: newCode }, { merge: true });
+          setRfidCode(newCode);
+        }
+      } catch (error) {
+        console.error("Error fetching/saving RFID code:", error);
+      } finally {
+        setIsGenerating(false);
+      }
     }
   };
 
   useEffect(() => {
+    // Guard: user may be null briefly during auth state transitions
+    if (!user) return;
+
     const fetchBookings = async () => {
       try {
         const q = query(
@@ -59,7 +81,10 @@ export function Dashboard() {
     };
     
     fetchBookings();
-  }, [user.uid]);
+  }, [user]);
+
+  // All hooks are declared above — safe to return null conditionally here
+  if (!user) return null;
 
   const isElite = userData?.membershipStatus === "Elite";
 
@@ -96,7 +121,7 @@ export function Dashboard() {
                 <div className="flex justify-between items-start relative z-10">
                   <div className="flex items-center gap-2">
                     <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center drop-shadow-xl">
-                      <img src="/src/assets/logo.png" alt="Navy Sharks" className="w-full h-full object-contain" />
+                      <img src={logoUrl} alt="Navy Sharks" className="w-full h-full object-contain" />
                     </div>
                     <span className="text-white font-bold tracking-[0.2em] text-[10px] md:text-sm drop-shadow-md">NAVY SHARKS</span>
                   </div>
@@ -165,7 +190,7 @@ export function Dashboard() {
                 <div className="flex justify-between items-start relative z-10">
                   <div className="flex items-center gap-2 opacity-70">
                     <div className="w-10 h-10 flex items-center justify-center grayscale">
-                      <img src="/src/assets/logo.png" alt="Navy Sharks" className="w-full h-full object-contain" />
+                      <img src={logoUrl} alt="Navy Sharks" className="w-full h-full object-contain" />
                     </div>
                     <span className="text-slate-400 font-bold tracking-widest text-xs md:text-sm">NAVY SHARKS</span>
                   </div>
@@ -246,7 +271,25 @@ export function Dashboard() {
                 </div>
                 
                 <button
-                  onClick={() => setShowClaimModal(true)}
+                  onClick={async () => {
+                    if (!user) return;
+                    try {
+                      const userDocRef = doc(db, "users", user.uid);
+                      const userDoc = await getDoc(userDocRef);
+                      const existingPromo = userDoc.data()?.promoCode;
+                      if (existingPromo) {
+                        setPromoCode(existingPromo);
+                      } else {
+                        const prefix = userData?.name ? userData.name.substring(0, 3).toUpperCase() : 'VIP';
+                        const newCode = `${prefix}-${crypto.randomUUID().substring(0, 4).toUpperCase()}`;
+                        await setDoc(userDocRef, { promoCode: newCode }, { merge: true });
+                        setPromoCode(newCode);
+                      }
+                    } catch (err) {
+                      console.error("Error generating promo code:", err);
+                    }
+                    setShowClaimModal(true);
+                  }}
                   disabled={tripCredits === 0}
                   className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
                     tripCredits > 0 
@@ -354,28 +397,26 @@ export function Dashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-10 h-full flex flex-col items-center justify-center relative">
-                  <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center border border-slate-800">
-                    <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center border border-slate-700 mb-6 relative">
-                      <Shield className="w-8 h-8 text-slate-500" />
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-lg">
-                        <Crown className="w-4 h-4 text-slate-950" />
-                      </div>
+                <div className="text-center w-full min-h-[320px] flex flex-col items-center justify-center bg-slate-950/40 backdrop-blur-[2px] rounded-2xl border border-slate-800 p-8 mt-auto">
+                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center border border-slate-700 mb-6 relative">
+                    <Shield className="w-8 h-8 text-slate-500" />
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-lg">
+                      <Crown className="w-4 h-4 text-slate-950" />
                     </div>
-                    
-                    <h3 className="text-2xl font-bold text-white mb-3">Elite Exclusive</h3>
-                    <p className="text-slate-400 mb-8 max-w-sm mx-auto text-sm leading-relaxed px-4">
-                      Upgrade to Elite Membership to unlock your 24/7 personal concierge for VIP travel bookings, sold-out event access, and bespoke requests.
-                    </p>
-                    
-                    <button
-                      onClick={() => navigate('/membership?join=true')}
-                      className="group relative inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                    >
-                      <span>Upgrade Now</span>
-                      <span className="opacity-70 font-normal">| $4,900</span>
-                    </button>
                   </div>
+                  
+                  <h3 className="text-2xl font-bold text-white mb-3">Elite Exclusive</h3>
+                  <p className="text-slate-400 mb-8 max-w-sm mx-auto text-sm leading-relaxed px-4">
+                    Upgrade to Elite Membership to unlock your 24/7 personal concierge for VIP travel bookings, sold-out event access, and bespoke requests.
+                  </p>
+                  
+                  <button
+                    onClick={() => navigate('/membership?join=true')}
+                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                  >
+                    <span>Upgrade Now</span>
+                    <span className="opacity-70 font-normal">| $4,900</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -507,14 +548,17 @@ export function Dashboard() {
 
             <div className="w-full bg-slate-950 rounded-2xl border-2 border-dashed border-green-500/50 flex flex-col items-center justify-center p-6 relative overflow-hidden mb-6">
               <div className="text-2xl font-mono font-bold tracking-[0.25em] text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
-                {userData?.name ? userData.name.substring(0,3).toUpperCase() : 'VIP'}-{Math.random().toString(36).substring(2, 6).toUpperCase()}
+                {promoCode || "Generating..."}
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-green-500/10 to-transparent pointer-events-none" />
             </div>
             
             <button
-              onClick={() => {
-                toast.success("Promo code copied to clipboard!");
+              onClick={async () => {
+                if (promoCode) {
+                  await navigator.clipboard.writeText(promoCode);
+                  toast.success("Promo code copied to clipboard!");
+                }
                 setShowClaimModal(false);
               }}
               className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(74,222,128,0.3)]"
