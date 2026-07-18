@@ -56,7 +56,20 @@ export function EliteMembershipModal({
         throw new Error(data.error || "Failed to create verification session");
       }
     } catch (error: any) {
-      toast.error("Verification failed", { id: "identity", description: error.message });
+      let title = "Verification Failed";
+      let description = error.message;
+
+      // Handle the specific Stripe Identity not activated error gracefully
+      if (error.message && error.message.includes("not set up to use Identity")) {
+        title = "Stripe Identity Not Activated";
+        description = "This feature requires manual activation in your live Stripe Dashboard. Please visit Stripe > Settings > Identity to enable live verifications.";
+      }
+
+      toast.error(title, { 
+        id: "identity", 
+        description: description,
+        duration: 8000
+      });
       setVerificationStatus("pending");
     }
   };
