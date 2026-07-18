@@ -237,7 +237,9 @@ export function EliteMembershipModal({
                       </div>
                       <div className="ml-auto shrink-0">
                         {verificationStatus === 'pending' && (
-                          <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                          <button 
+                            onClick={simulateStripeIdentity}
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
                             <Upload className="w-4 h-4 shrink-0" /> Upload
                           </button>
                         )}
