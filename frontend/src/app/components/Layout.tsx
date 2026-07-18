@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { ErrorBoundary } from "./ErrorBoundary";
+import logoUrl from "../../assets/logo.png";
 
 export function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,7 +39,7 @@ export function Layout() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="w-12 h-12 flex items-center justify-center transition-transform group-hover:scale-105">
-                <img src="/src/assets/logo.png" alt="Navy Sharks Logo" className="w-full h-full object-contain" />
+                <img src={logoUrl} alt="Navy Sharks Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-white font-bold tracking-[0.2em] text-lg hidden sm:block drop-shadow-md">NAVY SHARKS</span>
             </Link>
@@ -175,7 +176,7 @@ export function Layout() {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 flex items-center justify-center opacity-80">
-                  <img src="/src/assets/logo.png" alt="Navy Sharks Logo" className="w-full h-full object-contain grayscale" />
+                  <img src={logoUrl} alt="Navy Sharks Logo" className="w-full h-full object-contain grayscale" />
                 </div>
                 <span className="text-xl font-bold tracking-widest text-white">NAVY SHARKS</span>
               </div>
