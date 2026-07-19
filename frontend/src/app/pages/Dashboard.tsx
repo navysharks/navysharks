@@ -209,19 +209,19 @@ export function Dashboard() {
                     <div className="flex justify-between text-[10px] md:text-xs font-medium uppercase tracking-wider">
                       <span className="text-slate-400">Elite Progression</span>
                       <span className="text-cyan-400">
-                        ${totalSpent.toLocaleString(undefined, { maximumFractionDigits: 0 })} / $4,900
+                        ${totalSpent.toLocaleString(undefined, { maximumFractionDigits: 0 })} / $10,000
                       </span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-1000 relative"
-                        style={{ width: `${Math.min((totalSpent / 4900) * 100, 100)}%` }}
+                        style={{ width: `${Math.min((totalSpent / 10000) * 100, 100)}%` }}
                       >
                         <div className="absolute inset-0 bg-white/20 animate-pulse" />
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-500">
-                      Spend ${Math.max(4900 - totalSpent, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} more to unlock Elite Concierge.
+                      Spend ${Math.max(10000 - totalSpent, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} more to unlock Elite Concierge.
                     </p>
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export function Dashboard() {
                     className="group relative inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                   >
                     <span>Upgrade Now</span>
-                    <span className="opacity-70 font-normal">| $4,900</span>
+                    <span className="opacity-70 font-normal">| $49/mo or $245/yr</span>
                   </button>
                 </div>
               )}
