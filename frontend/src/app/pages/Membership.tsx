@@ -52,8 +52,7 @@ export function Membership() {
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [showEliteMessage, setShowEliteMessage] = useState(false);
   const [aviationQty, setAviationQty] = useState(1);
-  const [aviationTier, setAviationTier] = useState<"standard" | "firstclass">("standard");
-  const [aviationCustomAmount, setAviationCustomAmount] = useState("");
+  const [aviationTiers, setAviationTiers] = useState<string[]>(["standard"]);
 
   const handleAddonClick = (addonId: string) => {
     if (addonId === 'elite') {
@@ -1595,28 +1594,14 @@ export function Membership() {
                   
                   <div className="space-y-4">
                     <div className="flex flex-col gap-2">
-                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTier === 'standard' ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
-                        <input type="radio" name="aviationTier" className="accent-cyan-400" checked={aviationTier === 'standard'} onChange={() => setAviationTier('standard')} />
+                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTiers.includes('standard') ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
+                        <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationTiers.includes('standard')} onChange={() => setAviationTiers(prev => prev.includes('standard') ? prev.filter(t => t !== 'standard') : [...prev, 'standard'])} />
                         <span className="text-sm font-medium">Standard Credit ($349*)</span>
                       </label>
-                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTier === 'firstclass' ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
-                        <input type="radio" name="aviationTier" className="accent-cyan-400" checked={aviationTier === 'firstclass'} onChange={() => setAviationTier('firstclass')} />
+                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTiers.includes('firstclass') ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
+                        <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationTiers.includes('firstclass')} onChange={() => setAviationTiers(prev => prev.includes('firstclass') ? prev.filter(t => t !== 'firstclass') : [...prev, 'firstclass'])} />
                         <span className="text-sm font-medium">First Class Flyer Credit ($999*)</span>
                       </label>
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-slate-400 mb-1 block">Or insert custom credit amount:</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
-                        <input 
-                          type="number" 
-                          value={aviationCustomAmount} 
-                          onChange={e => setAviationCustomAmount(e.target.value)} 
-                          className="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 pl-7 text-sm focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all" 
-                          placeholder="Amount" 
-                        />
-                      </div>
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-700">
