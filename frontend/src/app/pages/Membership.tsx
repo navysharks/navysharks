@@ -49,6 +49,29 @@ export function Membership() {
   const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
   const [currency, setCurrency] = useState<"USD" | "EUR" | "AUD">("USD");
   const [userToken, setUserToken] = useState<string | null>(null);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  const [showEliteMessage, setShowEliteMessage] = useState(false);
+
+  const handleAddonClick = (addonId: string) => {
+    if (addonId === 'elite') {
+      if (selectedAddons.length === 0 || (selectedAddons.length === 1 && selectedAddons[0] === 'elite')) {
+        setShowEliteMessage(true);
+        setTimeout(() => setShowEliteMessage(false), 4000);
+        return;
+      }
+    }
+    
+    setSelectedAddons(prev => {
+      const isSelected = prev.includes(addonId);
+      let next = isSelected ? prev.filter(id => id !== addonId) : [...prev, addonId];
+      
+      if (addonId !== 'elite' && isSelected && next.length === 1 && next[0] === 'elite') {
+        next = [];
+      }
+      
+      return next;
+    });
+  };
 
   // Fetch token when checkout modal opens
   const handleOpenCalendarWithToken = async (bundleName: string, price: string) => {
@@ -1495,20 +1518,37 @@ export function Membership() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto mb-8">
-            <div className="bg-slate-800 p-6 rounded-xl border border-amber-500/50 text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="text-2xl font-bold text-amber-400 mb-2 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
-                FREE
+            <div className="relative group">
+              <div 
+                onClick={() => handleAddonClick('elite')}
+                className={`bg-slate-800 p-6 rounded-xl border text-center relative overflow-hidden group cursor-pointer transition-all ${
+                  selectedAddons.includes('elite') ? 'border-amber-400 bg-slate-800/80 ring-2 ring-amber-400/50' : 'border-amber-500/50 hover:border-amber-400'
+                }`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="text-2xl font-bold text-amber-400 mb-2 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+                  FREE
+                </div>
+                <h3 className="font-semibold text-amber-50 mb-2">
+                  Elite Concierge
+                </h3>
+                <p className="text-sm text-amber-200/70">
+                  24/7 dedicated chat for 24 hours
+                </p>
               </div>
-              <h3 className="font-semibold text-amber-50 mb-2">
-                Elite Concierge
-              </h3>
-              <p className="text-sm text-amber-200/70">
-                24/7 dedicated chat for 24 hours
-              </p>
+              {showEliteMessage && (
+                <div className="absolute -bottom-16 left-0 right-0 bg-red-900/90 text-red-100 text-xs p-2 rounded border border-red-500/50 text-center z-10 shadow-lg animate-in fade-in slide-in-from-top-2">
+                  Complimentary elite membership addition is only available for 24 hours when combined with another add-on.
+                </div>
+              )}
             </div>
 
-            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+            <div 
+              onClick={() => handleAddonClick('marine')}
+              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                selectedAddons.includes('marine') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+              }`}
+            >
               <div className="text-2xl font-bold text-cyan-400 mb-2">
                 +$499
               </div>
@@ -1520,7 +1560,12 @@ export function Membership() {
               </p>
             </div>
 
-            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+            <div 
+              onClick={() => handleAddonClick('aviation')}
+              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+              }`}
+            >
               <div className="text-2xl font-bold text-cyan-400 mb-2">
                 +$349+
               </div>
@@ -1532,7 +1577,12 @@ export function Membership() {
               </p>
             </div>
 
-            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+            <div 
+              onClick={() => handleAddonClick('accommodation')}
+              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                selectedAddons.includes('accommodation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+              }`}
+            >
               <div className="text-2xl font-bold text-cyan-400 mb-2">
                 +$249
               </div>
@@ -1544,7 +1594,12 @@ export function Membership() {
               </p>
             </div>
 
-            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+            <div 
+              onClick={() => handleAddonClick('club')}
+              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                selectedAddons.includes('club') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+              }`}
+            >
               <div className="text-2xl font-bold text-cyan-400 mb-2">
                 +$199
               </div>
