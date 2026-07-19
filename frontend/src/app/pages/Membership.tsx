@@ -48,6 +48,13 @@ export function Membership() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
   const [isAviationModalOpen, setIsAviationModalOpen] = useState(false);
+  const [isMarineModalOpen, setIsMarineModalOpen] = useState(false);
+  const [isAccommodationModalOpen, setIsAccommodationModalOpen] = useState(false);
+  const [isClubModalOpen, setIsClubModalOpen] = useState(false);
+
+  const [marineQty, setMarineQty] = useState(0);
+  const [accommodationQty, setAccommodationQty] = useState(0);
+  const [clubQty, setClubQty] = useState(0);
   const [currency, setCurrency] = useState<"USD" | "EUR" | "AUD">("USD");
   const [userToken, setUserToken] = useState<string | null>(null);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
@@ -65,6 +72,18 @@ export function Membership() {
     }
     if (addonId === 'aviation') {
       setIsAviationModalOpen(true);
+      return;
+    }
+    if (addonId === 'marine') {
+      setIsMarineModalOpen(true);
+      return;
+    }
+    if (addonId === 'accommodation') {
+      setIsAccommodationModalOpen(true);
+      return;
+    }
+    if (addonId === 'club') {
+      setIsClubModalOpen(true);
       return;
     }
     
@@ -2058,6 +2077,165 @@ export function Membership() {
                   >
                     <span className="text-lg">Add to cart</span>
                     <span className="text-lg">${((aviationStandardQty * 349) + (aviationFirstClassQty * 999)).toLocaleString()}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Marine Modal */}
+      {isMarineModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
+              <h3 className="font-bold text-xl text-cyan-400">Marine Credit</h3>
+              <button onClick={() => setIsMarineModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${marineQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={marineQty > 0} onChange={() => setMarineQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Yacht + Jetski ($499*)</span>
+                  </div>
+                  {marineQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineQty(Math.max(1, marineQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{marineQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineQty(marineQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for all marine services
+              </p>
+
+              {marineQty > 0 && (
+                <div className="pt-4">
+                  <button 
+                    onClick={() => { 
+                      if (!selectedAddons.includes('marine')) {
+                        setSelectedAddons([...selectedAddons, 'marine']);
+                      }
+                      setIsMarineModalOpen(false);
+                    }}
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
+                  >
+                    <span className="text-lg">Add to cart</span>
+                    <span className="text-lg">${(marineQty * 499).toLocaleString()}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Accommodation Modal */}
+      {isAccommodationModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
+              <h3 className="font-bold text-xl text-cyan-400">Accommodation Credit</h3>
+              <button onClick={() => setIsAccommodationModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${accommodationQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={accommodationQty > 0} onChange={() => setAccommodationQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Premium stays ($249*)</span>
+                  </div>
+                  {accommodationQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationQty(Math.max(1, accommodationQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{accommodationQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationQty(accommodationQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for premium stays & upgrades
+              </p>
+
+              {accommodationQty > 0 && (
+                <div className="pt-4">
+                  <button 
+                    onClick={() => { 
+                      if (!selectedAddons.includes('accommodation')) {
+                        setSelectedAddons([...selectedAddons, 'accommodation']);
+                      }
+                      setIsAccommodationModalOpen(false);
+                    }}
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
+                  >
+                    <span className="text-lg">Add to cart</span>
+                    <span className="text-lg">${(accommodationQty * 249).toLocaleString()}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Club Modal */}
+      {isClubModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
+              <h3 className="font-bold text-xl text-cyan-400">Club Credit</h3>
+              <button onClick={() => setIsClubModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${clubQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={clubQty > 0} onChange={() => setClubQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Dining & Nightlife ($199*)</span>
+                  </div>
+                  {clubQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubQty(Math.max(1, clubQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{clubQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubQty(clubQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for dining, nightlife, & security
+              </p>
+
+              {clubQty > 0 && (
+                <div className="pt-4">
+                  <button 
+                    onClick={() => { 
+                      if (!selectedAddons.includes('club')) {
+                        setSelectedAddons([...selectedAddons, 'club']);
+                      }
+                      setIsClubModalOpen(false);
+                    }}
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
+                  >
+                    <span className="text-lg">Add to cart</span>
+                    <span className="text-lg">${(clubQty * 199).toLocaleString()}</span>
                   </button>
                 </div>
               )}
