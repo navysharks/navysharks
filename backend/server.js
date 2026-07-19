@@ -9,6 +9,7 @@ const port = process.env.PORT || 5000;
 // Restrict CORS to the configured frontend URL only
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
+  'https://navysharks.com',
   'http://localhost:5173',
 ];
 app.use(cors({
