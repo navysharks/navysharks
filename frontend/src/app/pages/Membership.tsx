@@ -1626,6 +1626,21 @@ export function Membership() {
                     <p className="text-xs text-cyan-300 bg-cyan-900/30 p-2.5 rounded-lg border border-cyan-500/30 text-center leading-relaxed">
                       All bought credit can be used for all aviation services
                     </p>
+
+                    {(aviationStandardQty > 0 || aviationFirstClassQty > 0) && (
+                      <div className="pt-2">
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            // Can add specific add-to-cart logic here in the future
+                          }}
+                          className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-between shadow-lg shadow-cyan-500/20"
+                        >
+                          <span>Add to cart</span>
+                          <span>${((aviationStandardQty * 349) + (aviationFirstClassQty * 999)).toLocaleString()}</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
