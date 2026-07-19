@@ -350,7 +350,7 @@ export function Membership() {
             <h2 className="text-3xl md:text-4xl font-bold mb-2 md:mb-3 text-cyan-400">
               {currentDestination.name} Experiences
             </h2>
-            <p className="text-base md:text-lg text-slate-400">
+            <p className={`text-base md:text-lg text-slate-400 ${currentDestination.comingSoon ? 'blur-[5px] opacity-40 select-none pointer-events-none' : ''}`}>
               {currentDestination.location}
             </p>
           </div>
