@@ -47,7 +47,7 @@ export function Membership() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
-  const [currency, setCurrency] = useState<"USD" | "GBP" | "AUD">("USD");
+  const [currency, setCurrency] = useState<"USD" | "EUR" | "AUD">("USD");
   const [userToken, setUserToken] = useState<string | null>(null);
 
   // Fetch token when checkout modal opens
@@ -65,9 +65,9 @@ export function Membership() {
     const rawPrice = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
     if (isNaN(rawPrice)) return priceStr;
 
-    if (currency === "GBP") {
-      const converted = Math.round(rawPrice * 0.78);
-      return `£${converted.toLocaleString()}`;
+    if (currency === "EUR") {
+      const converted = Math.round(rawPrice * 0.92);
+      return `€${converted.toLocaleString()}`;
     }
     if (currency === "AUD") {
       const converted = Math.round(rawPrice * 1.5);
@@ -323,7 +323,7 @@ export function Membership() {
           </div>
 
           <div className="flex bg-slate-900 rounded-full p-1 border border-slate-800">
-            {(["USD", "GBP", "AUD"] as const).map((curr) => (
+            {(["USD", "EUR", "AUD"] as const).map((curr) => (
               <button
                 key={curr}
                 onClick={() => setCurrency(curr)}
