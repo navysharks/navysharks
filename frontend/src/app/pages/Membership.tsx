@@ -1570,9 +1570,10 @@ export function Membership() {
                 +$349
               </div>
               <h3 className="font-semibold mb-2">
-                Helicopters + jets
+                Aviation Credit
               </h3>
               <p className="text-sm text-slate-400">
+                Helicopters + jets <br />
                 Helicopter transfers starting from 349*
               </p>
             </div>
