@@ -51,6 +51,9 @@ export function Membership() {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [showEliteMessage, setShowEliteMessage] = useState(false);
+  const [aviationQty, setAviationQty] = useState(1);
+  const [aviationTier, setAviationTier] = useState<"standard" | "firstclass">("standard");
+  const [aviationCustomAmount, setAviationCustomAmount] = useState("");
 
   const handleAddonClick = (addonId: string) => {
     if (addonId === 'elite') {
@@ -1561,21 +1564,76 @@ export function Membership() {
             </div>
 
             <div 
-              onClick={() => handleAddonClick('aviation')}
-              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
-                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+              onClick={() => {
+                if (!selectedAddons.includes('aviation')) handleAddonClick('aviation');
+              }}
+              className={`bg-slate-800 p-6 rounded-xl border text-center transition-all ${
+                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50 cursor-default col-span-1 sm:col-span-2 lg:col-span-2' : 'border-slate-700 hover:border-slate-500 cursor-pointer'
               }`}
             >
-              <div className="text-2xl font-bold text-cyan-400 mb-2">
-                +$349
-              </div>
-              <h3 className="font-semibold mb-2">
-                Aviation Credit
-              </h3>
-              <p className="text-sm text-slate-400">
-                Helicopters + jets <br />
-                Helicopter transfers starting from 349*
-              </p>
+              {!selectedAddons.includes('aviation') ? (
+                <>
+                  <div className="text-2xl font-bold text-cyan-400 mb-2">
+                    +$349
+                  </div>
+                  <h3 className="font-semibold mb-2">
+                    Aviation Credit
+                  </h3>
+                  <p className="text-sm text-slate-400">
+                    Helicopters + jets <br />
+                    Helicopter transfers starting from 349*
+                  </p>
+                </>
+              ) : (
+                <div className="text-left animate-in fade-in zoom-in duration-300">
+                  <div className="flex justify-between items-center mb-4 border-b border-slate-600 pb-2">
+                    <h3 className="font-semibold text-lg text-cyan-400">Aviation Credit</h3>
+                    <button onClick={(e) => { e.stopPropagation(); handleAddonClick('aviation'); }} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-1 border border-slate-600">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex flex-col gap-2">
+                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTier === 'standard' ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
+                        <input type="radio" name="aviationTier" className="accent-cyan-400" checked={aviationTier === 'standard'} onChange={() => setAviationTier('standard')} />
+                        <span className="text-sm font-medium">Standard Credit ($349*)</span>
+                      </label>
+                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTier === 'firstclass' ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
+                        <input type="radio" name="aviationTier" className="accent-cyan-400" checked={aviationTier === 'firstclass'} onChange={() => setAviationTier('firstclass')} />
+                        <span className="text-sm font-medium">First Class Flyer Credit ($999*)</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Or insert custom credit amount:</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                        <input 
+                          type="number" 
+                          value={aviationCustomAmount} 
+                          onChange={e => setAviationCustomAmount(e.target.value)} 
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 pl-7 text-sm focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all" 
+                          placeholder="Amount" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-700">
+                      <span className="text-sm text-slate-300 font-medium">Quantity</span>
+                      <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1">
+                        <button onClick={() => setAviationQty(Math.max(1, aviationQty - 1))} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">-</button>
+                        <span className="text-sm w-4 text-center font-bold">{aviationQty}</span>
+                        <button onClick={() => setAviationQty(aviationQty + 1)} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">+</button>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-cyan-300 bg-cyan-900/30 p-2.5 rounded-lg border border-cyan-500/30 text-center leading-relaxed">
+                      All bought credit can be used for all aviation services
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div 
