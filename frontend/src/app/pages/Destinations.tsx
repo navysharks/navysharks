@@ -14,6 +14,7 @@ import phSiargao from "../../assets/Philippines/Siargao.jpg";
 
 function DestinationImageCrossfade({ dest }: { dest: any }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const isComingSoon = dest.country.includes("Coming Soon");
 
   useEffect(() => {
     if (!dest.images || dest.images.length <= 1) return;
@@ -33,17 +34,27 @@ function DestinationImageCrossfade({ dest }: { dest: any }) {
             alt={dest.country}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
               idx === currentImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            } group-hover:scale-105`}
+            } group-hover:scale-105 ${isComingSoon ? 'brightness-[0.4] grayscale' : ''}`}
           />
         ))
       ) : (
         <img
           src={dest.image}
           alt={dest.country}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isComingSoon ? 'brightness-[0.4] grayscale' : ''}`}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none"></div>
+
+      {isComingSoon && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="border-4 border-cyan-400 bg-slate-950/60 px-8 py-4 backdrop-blur-sm transform -rotate-12">
+            <span className="text-cyan-400 font-black text-4xl tracking-widest uppercase drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">
+              Coming Soon
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -138,7 +149,7 @@ export function Destinations() {
 
                 <div className={index % 2 === 1 ? "md:order-1" : ""}>
                   <h2 className="text-4xl font-bold mb-4 text-cyan-400">
-                    {dest.country}
+                    {dest.country.replace(" (Coming Soon)", "")}
                   </h2>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {dest.cities.map((city) => (
