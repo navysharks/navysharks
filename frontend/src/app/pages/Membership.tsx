@@ -1519,7 +1519,7 @@ export function Membership() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto mb-8 items-start">
             <div className="relative group">
               <div 
                 onClick={() => handleAddonClick('elite')}
@@ -1567,7 +1567,7 @@ export function Membership() {
                 if (!selectedAddons.includes('aviation')) handleAddonClick('aviation');
               }}
               className={`bg-slate-800 p-6 rounded-xl border text-center transition-all ${
-                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50 cursor-default col-span-1 sm:col-span-2 lg:col-span-2' : 'border-slate-700 hover:border-slate-500 cursor-pointer'
+                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50 cursor-default' : 'border-slate-700 hover:border-slate-500 cursor-pointer'
               }`}
             >
               {!selectedAddons.includes('aviation') ? (
