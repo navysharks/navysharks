@@ -8,12 +8,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme="dark"
       className="toaster group"
       toastOptions={{
-        classNames: {
-          toast: "group toast group-[.toaster]:bg-slate-900 group-[.toaster]:text-slate-100 group-[.toaster]:border-slate-800 shadow-lg",
-          description: "group-[.toast]:text-slate-400",
-          actionButton: "group-[.toast]:bg-slate-50 group-[.toast]:text-slate-900",
-          cancelButton: "group-[.toast]:bg-slate-800 group-[.toast]:text-slate-400",
+        style: {
+          background: '#0f172a', // slate-900
+          color: '#f8fafc', // slate-50
+          borderColor: '#1e293b', // slate-800
         },
+        className: 'border-slate-800',
+        descriptionClassName: 'text-slate-400 font-medium',
       }}
       {...props}
     />
