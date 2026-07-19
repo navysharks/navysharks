@@ -1573,7 +1573,7 @@ export function Membership() {
                 Aviation Credit
               </h3>
               <p className="text-sm text-slate-400">
-                Starting from $349 for helicopter transfers
+                Starting from $349 for helicopter + private jet
               </p>
             </div>
 
