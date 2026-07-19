@@ -9,10 +9,10 @@ export function Partners() {
   const [selectedCountry, setSelectedCountry] = useState("all");
 
   const categories = [
-    { id: "marine", label: "Marine & Yachts", icon: Anchor },
+    { id: "marine", label: "Marine", icon: Anchor },
     { id: "nightclubs", label: "VIP Nightlife", icon: Music },
-    { id: "hotels", label: "Hotels & Resorts", icon: Hotel },
-    { id: "restaurants", label: "Fine Dining", icon: Utensils },
+    { id: "hotels", label: "Accommodation", icon: Hotel },
+    { id: "restaurants", label: "Dining", icon: Utensils },
   ];
 
   const partners = {
