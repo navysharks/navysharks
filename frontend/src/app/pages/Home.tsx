@@ -300,7 +300,7 @@ export function Home() {
               </p>
               <div>
                 <h4 className="font-bold text-white">Michael R.</h4>
-                <p className="text-sm text-slate-500">Sydney, AUS • Privé Member</p>
+                <p className="text-sm text-slate-500">Sydney, AUS • Elite Member</p>
               </div>
             </div>
 
