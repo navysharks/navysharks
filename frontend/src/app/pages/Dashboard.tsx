@@ -6,7 +6,7 @@ import { collection, getDocs, query, orderBy, doc, setDoc, getDoc } from "fireba
 import { db } from "../../firebase";
 import { toast } from "sonner";
 import { ConciergeChatModal } from "../components/ConciergeChatModal";
-import logoUrl from "../../assets/logo.png";
+import logoUrl from "../../assets/logo_optimized.webp";
 
 export function Dashboard() {
   const { user, userData } = useAuth();

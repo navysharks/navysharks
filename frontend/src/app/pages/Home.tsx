@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { Shield, MapPin, Award, Users, ChevronRight, Star } from "lucide-react";
-import videoBackground from "../../imports/small.mp4";
+import videoBackground from "../../imports/small_optimized.mp4";
 import thailandBackground from "../../imports/thailand-background.png";
 import philippinesBackground from "../../imports/philippines-background.png";
 import { homeDestinationsComingSoonBackgrounds } from "../comingSoonBackgrounds";

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -41,18 +42,29 @@ const webhookRoutes = require('./src/routes/webhook');
 const identityRoutes = require('./src/routes/identity');
 const contactRoutes = require('./src/routes/contact');
 
+// General rate limit: 100 requests per 15 minutes
+const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+app.use(generalLimiter);
+
+// Strict limit for contact form: 5 per 15 minutes
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 5,
+  message: { error: 'Too many messages sent. Please try again later.' }
+});
+
 // In Firebase, the function name "api" is stripped from the URL.
 // So /api/payment becomes /payment inside Express.
 app.use('/payment', paymentRoutes);
 app.use('/webhook', webhookRoutes);
 app.use('/identity', identityRoutes);
-app.use('/contact', contactRoutes);
+app.use('/contact', contactLimiter, contactRoutes);
 
 // Also keep the /api prefix for local development without Firebase emulators
 app.use('/api/payment', paymentRoutes);
 app.use('/api/webhook', webhookRoutes);
 app.use('/api/identity', identityRoutes);
-app.use('/api/contact', contactRoutes);
+app.use('/api/contact', contactLimiter, contactRoutes);
 
 // Export for Firebase Functions
 module.exports = app;

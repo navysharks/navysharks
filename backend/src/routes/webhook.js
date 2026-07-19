@@ -75,7 +75,21 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
                       <h3>Your Booking is Confirmed!</h3>
                       <p>Thank you for booking the <strong>${session.metadata.bundleName}</strong> experience.</p>
                       <p><strong>Date:</strong> ${new Date(session.metadata.date).toLocaleDateString()}</p>
-                      ${parsedAddons.length > 0 ? `<p><strong>Enhancements:</strong> ${parsedAddons.join(', ')}</p>` : ''}
+                      ${parsedAddons.length > 0 ? `<p><strong>Enhancements:</strong> ${parsedAddons.map(a => {
+                        if (typeof a === 'string') return a;
+                        const addonNames = {
+                          helicopter: "Helicopter Airport Transfer",
+                          yacht_ext: "Extend Yacht Charter (+4 hrs)",
+                          vip_night: "Extra VIP Nightlife Experience",
+                          aviation_standard: "Aviation Standard Credit",
+                          aviation_first_class: "Aviation First Class Flyer",
+                          marine: "Marine Credit (Yacht + Jetski)",
+                          accommodation: "Accommodation Credit (Premium Stays)",
+                          club: "Club Credit (Dining & Nightlife)",
+                        };
+                        const name = addonNames[a.id] || a.id;
+                        return a.quantity > 1 ? `${name} x${a.quantity}` : name;
+                      }).join(', ')}</p>` : ''}
                       <p>Total Paid: ${(session.amount_total / 100).toFixed(2)} ${session.currency.toUpperCase()}</p>
                       <br/>
                       <p>Our concierge team will reach out to you shortly via WhatsApp to finalize the details.</p>

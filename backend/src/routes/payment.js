@@ -56,7 +56,7 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
     res.json({ id: session.id, url: session.url });
   } catch (error) {
     console.error('Error creating checkout session:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'An error occurred creating your checkout session. Please try again.' });
   }
 });
 
@@ -70,8 +70,23 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       return res.status(400).json({ error: 'Missing required fields: bundleName, price, date' });
     }
 
-    // Convert price string (e.g. "$980") to cents integer
-    const priceAmount = parseInt(price.replace(/[^0-9]/g, ''), 10) * 100;
+    // Server-side price validation — NEVER trust client-supplied prices
+    const bundlePriceMap = {
+      "VIP Weekend Access": 98000,
+      "Luxe Escape Experience": 129000,
+      "Yacht & River Elite": 165000,
+      "Explorer's Paradise": 78000,
+      "Ultimate Island Experience": 115000,
+      "Private Yacht Expedition": 155000,
+      "Urban Discovery": 92000,
+      "Total Immersion": 125000,
+      "VIP Cultural Journey": 175000,
+    };
+
+    const priceAmount = bundlePriceMap[bundleName];
+    if (!priceAmount) {
+      return res.status(400).json({ error: `Unknown bundle: ${bundleName}` });
+    }
 
     const line_items = [
       {
@@ -102,7 +117,7 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       addons.forEach(item => {
         const isString = typeof item === 'string';
         const addonId = isString ? item : item.id;
-        const quantity = isString ? 1 : (item.quantity || 1);
+        const quantity = isString ? 1 : Math.min(Math.max(1, item.quantity || 1), 10);
 
         const addon = addonsMap[addonId];
         if (addon) {
@@ -140,7 +155,7 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
     res.json({ id: session.id, url: session.url });
   } catch (error) {
     console.error('Error creating bundle checkout session:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'An error occurred creating your checkout session. Please try again.' });
   }
 });
 

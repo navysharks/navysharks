@@ -3,7 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { ErrorBoundary } from "./ErrorBoundary";
-import logoUrl from "../../assets/logo.png";
+import logoUrl from "../../assets/logo_optimized.webp";
 
 export function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
