@@ -1530,14 +1530,14 @@ export function Membership() {
                   FREE
                 </div>
                 <h3 className="font-semibold text-amber-50 mb-2">
-                  Elite Concierge
+                  Elite Concierge Chat
                 </h3>
                 <p className="text-sm text-amber-200/70">
                   24/7 dedicated chat for 24 hours
                 </p>
               </div>
               {showEliteMessage && (
-                <div className="absolute -bottom-16 left-0 right-0 bg-red-900/90 text-red-100 text-xs p-2 rounded border border-red-500/50 text-center z-10 shadow-lg animate-in fade-in slide-in-from-top-2">
+                <div className="absolute top-full mt-2 left-0 right-0 bg-red-900/90 text-red-100 text-xs p-2 rounded border border-red-500/50 text-center z-20 shadow-lg animate-in fade-in slide-in-from-top-2">
                   Please select at least one credit first to unlock your FREE 24-hour Elite Concierge Chat.
                 </div>
               )}
