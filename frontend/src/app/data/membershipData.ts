@@ -357,7 +357,7 @@ export const destinations: Record<string, Destination> = {
   },
   colombia: {
     name: "Colombia",
-    location: "Medellín • Cartagena • Bogotá",
+    location: "Medellín (Coming Soon) • Cartagena (Coming Soon) • Bogotá (Coming Soon)",
     comingSoon: true,
     comingSoonImage: experiencesComingSoonBackgrounds.colombia,
     bundles: [
@@ -415,7 +415,7 @@ export const destinations: Record<string, Destination> = {
   },
   brazil: {
     name: "Brazil",
-    location: "Rio • São Paulo • Florianópolis",
+    location: "Rio (Coming Soon) • São Paulo (Coming Soon) • Florianópolis (Coming Soon)",
     comingSoon: true,
     comingSoonImage: experiencesComingSoonBackgrounds.brazil,
     bundles: [
