@@ -1500,10 +1500,10 @@ export function Membership() {
                 +$499
               </div>
               <h3 className="font-semibold mb-2">
-                Yacht + Jetski Credit
+                Marine Credit
               </h3>
               <p className="text-sm text-slate-400">
-                Marine adventure package
+                Yacht + Jetski
               </p>
             </div>
 
