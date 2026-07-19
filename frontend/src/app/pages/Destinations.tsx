@@ -25,7 +25,7 @@ function DestinationImageCrossfade({ dest }: { dest: any }) {
   }, [dest.images]);
 
   return (
-    <div className="relative h-96 rounded-2xl overflow-hidden group cursor-pointer">
+    <div className="relative h-96 rounded-2xl overflow-hidden group cursor-pointer bg-slate-950">
       {dest.images ? (
         dest.images.map((img: string, idx: number) => (
           <img
@@ -34,14 +34,14 @@ function DestinationImageCrossfade({ dest }: { dest: any }) {
             alt={dest.country}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
               idx === currentImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            } group-hover:scale-105 ${isComingSoon ? 'brightness-[0.4] grayscale' : ''}`}
+            } group-hover:scale-105 ${isComingSoon ? 'opacity-30 blur-[2px]' : ''}`}
           />
         ))
       ) : (
         <img
           src={dest.image}
           alt={dest.country}
-          className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isComingSoon ? 'brightness-[0.4] grayscale' : ''}`}
+          className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isComingSoon ? 'opacity-30 blur-[2px]' : ''}`}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none"></div>
