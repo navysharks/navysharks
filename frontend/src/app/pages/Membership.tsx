@@ -1495,6 +1495,19 @@ export function Membership() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto mb-8">
+            <div className="bg-slate-800 p-6 rounded-xl border border-amber-500/50 text-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="text-2xl font-bold text-amber-400 mb-2 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+                FREE
+              </div>
+              <h3 className="font-semibold text-amber-50 mb-2">
+                Elite Concierge
+              </h3>
+              <p className="text-sm text-amber-200/70">
+                24/7 dedicated chat for 24 hours
+              </p>
+            </div>
+
             <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
               <div className="text-2xl font-bold text-cyan-400 mb-2">
                 +$499
@@ -1540,19 +1553,6 @@ export function Membership() {
               </h3>
               <p className="text-sm text-slate-400">
                 Dining, nightlife, & security
-              </p>
-            </div>
-
-            <div className="bg-slate-800 p-6 rounded-xl border border-amber-500/50 text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="text-2xl font-bold text-amber-400 mb-2 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
-                FREE
-              </div>
-              <h3 className="font-semibold text-amber-50 mb-2">
-                Elite Concierge
-              </h3>
-              <p className="text-sm text-amber-200/70">
-                24/7 dedicated chat for 24 hours
               </p>
             </div>
           </div>
