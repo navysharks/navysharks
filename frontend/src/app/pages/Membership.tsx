@@ -184,7 +184,7 @@ export function Membership() {
     setIsCheckoutOpen(true);
   };
 
-  const handleCheckoutComplete = async (selectedAddons: string[] = []) => {
+  const handleCheckoutComplete = async (checkoutModalAddons: string[] = []) => {
     if (!user) {
       toast.error("Please login to proceed with your booking");
       navigate("/login");
@@ -200,6 +200,24 @@ export function Membership() {
     toast.loading("Preparing secure checkout...", { id: "bundle-checkout" });
 
     try {
+      // Build unified addons payload combining modal selections and main page selections
+      const finalAddons: any[] = [];
+      
+      // 1. Add CheckoutModal addons (helicopter, yacht_ext, vip_night)
+      checkoutModalAddons.forEach(id => {
+        finalAddons.push({ id, quantity: 1 });
+      });
+
+      // 2. Add Membership page grid addons
+      if (selectedAddons.includes('marine')) finalAddons.push({ id: 'marine', quantity: 1 });
+      if (selectedAddons.includes('accommodation')) finalAddons.push({ id: 'accommodation', quantity: 1 });
+      if (selectedAddons.includes('club')) finalAddons.push({ id: 'club', quantity: 1 });
+      
+      if (selectedAddons.includes('aviation')) {
+        if (aviationStandardQty > 0) finalAddons.push({ id: 'aviation_standard', quantity: aviationStandardQty });
+        if (aviationFirstClassQty > 0) finalAddons.push({ id: 'aviation_first_class', quantity: aviationFirstClassQty });
+      }
+
       const token = await user.getIdToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://us-central1-navysharks.cloudfunctions.net/api'}/api/payment/create-bundle-checkout-session`, {
         method: "POST",
@@ -212,7 +230,7 @@ export function Membership() {
           bundleName: selectedBundleForCalendar,
           price: selectedBundlePrice,
           date: selectedDate.toISOString(),
-          addons: selectedAddons,
+          addons: finalAddons,
         })
       });
 

@@ -91,10 +91,19 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       helicopter: { name: "Helicopter Airport Transfer", price: 38000 },
       yacht_ext: { name: "Extend Yacht Charter (+4 hrs)", price: 60000 },
       vip_night: { name: "Extra VIP Nightlife Experience", price: 25000 },
+      aviation_standard: { name: "Aviation Standard Credit", price: 34900 },
+      aviation_first_class: { name: "Aviation First Class Flyer", price: 99900 },
+      marine: { name: "Marine Credit (Yacht + Jetski)", price: 49900 },
+      accommodation: { name: "Accommodation Credit (Premium Stays)", price: 24900 },
+      club: { name: "Club Credit (Dining & Nightlife)", price: 19900 },
     };
 
     if (Array.isArray(addons)) {
-      addons.forEach(addonId => {
+      addons.forEach(item => {
+        const isString = typeof item === 'string';
+        const addonId = isString ? item : item.id;
+        const quantity = isString ? 1 : (item.quantity || 1);
+
         const addon = addonsMap[addonId];
         if (addon) {
           line_items.push({
@@ -105,7 +114,7 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
               },
               unit_amount: addon.price,
             },
-            quantity: 1,
+            quantity: quantity,
           });
         }
       });
