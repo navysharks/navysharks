@@ -1538,7 +1538,7 @@ export function Membership() {
               </div>
               {showEliteMessage && (
                 <div className="absolute -bottom-16 left-0 right-0 bg-red-900/90 text-red-100 text-xs p-2 rounded border border-red-500/50 text-center z-10 shadow-lg animate-in fade-in slide-in-from-top-2">
-                  Complimentary elite membership addition is only available for 24 hours when combined with another add-on.
+                  Please select at least one credit first to unlock your FREE 24-hour Elite Concierge.
                 </div>
               )}
             </div>
