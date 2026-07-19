@@ -136,7 +136,9 @@ export function Destinations() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="space-y-20">
-            {destinations.map((dest, index) => (
+            {destinations.map((dest, index) => {
+              const isComingSoon = dest.country.includes("Coming Soon");
+              return (
               <div
                 key={dest.country}
                 className={`grid md:grid-cols-2 gap-12 items-center ${
@@ -151,33 +153,36 @@ export function Destinations() {
                   <h2 className="text-4xl font-bold mb-4 text-cyan-400">
                     {dest.country.replace(" (Coming Soon)", "")}
                   </h2>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {dest.cities.map((city) => (
-                      <span
-                        key={city}
-                        className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-sm"
-                      >
-                        {city}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-lg text-slate-300 mb-6">
-                    {dest.description}
-                  </p>
+                  
+                  <div className={`transition-all duration-500 ${isComingSoon ? 'blur-[5px] opacity-40 select-none pointer-events-none' : ''}`}>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {dest.cities.map((city) => (
+                        <span
+                          key={city}
+                          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-sm"
+                        >
+                          {city}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-lg text-slate-300 mb-6">
+                      {dest.description}
+                    </p>
 
-                  <div className="space-y-3">
-                    {dest.highlights.map((highlight, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                    <div className="space-y-3">
+                      {dest.highlights.map((highlight, idx) => (
+                        <div key={idx} className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                          </div>
+                          <p className="text-slate-300">{highlight}</p>
                         </div>
-                        <p className="text-slate-300">{highlight}</p>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
