@@ -51,8 +51,8 @@ export function Membership() {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [showEliteMessage, setShowEliteMessage] = useState(false);
-  const [aviationQty, setAviationQty] = useState(1);
-  const [aviationTiers, setAviationTiers] = useState<string[]>(["standard"]);
+  const [aviationStandardQty, setAviationStandardQty] = useState(1);
+  const [aviationFirstClassQty, setAviationFirstClassQty] = useState(0);
 
   const handleAddonClick = (addonId: string) => {
     if (addonId === 'elite') {
@@ -1594,23 +1594,33 @@ export function Membership() {
                   
                   <div className="space-y-4">
                     <div className="flex flex-col gap-2">
-                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTiers.includes('standard') ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
-                        <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationTiers.includes('standard')} onChange={() => setAviationTiers(prev => prev.includes('standard') ? prev.filter(t => t !== 'standard') : [...prev, 'standard'])} />
-                        <span className="text-sm font-medium">Standard Credit ($349*)</span>
+                      <label className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${aviationStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
+                        <div className="flex items-center gap-3">
+                          <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationStandardQty > 0} onChange={() => setAviationStandardQty(prev => prev > 0 ? 0 : 1)} />
+                          <span className="text-sm font-medium">Standard Credit ($349*)</span>
+                        </div>
+                        {aviationStandardQty > 0 && (
+                          <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1" onClick={e => e.preventDefault()}>
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(Math.max(1, aviationStandardQty - 1)); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">-</button>
+                            <span className="text-sm w-4 text-center font-bold">{aviationStandardQty}</span>
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(aviationStandardQty + 1); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">+</button>
+                          </div>
+                        )}
                       </label>
-                      <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${aviationTiers.includes('firstclass') ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
-                        <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationTiers.includes('firstclass')} onChange={() => setAviationTiers(prev => prev.includes('firstclass') ? prev.filter(t => t !== 'firstclass') : [...prev, 'firstclass'])} />
-                        <span className="text-sm font-medium">First Class Flyer Credit ($999*)</span>
+                      
+                      <label className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${aviationFirstClassQty > 0 ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
+                        <div className="flex items-center gap-3">
+                          <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationFirstClassQty > 0} onChange={() => setAviationFirstClassQty(prev => prev > 0 ? 0 : 1)} />
+                          <span className="text-sm font-medium">First Class Flyer Credit ($999*)</span>
+                        </div>
+                        {aviationFirstClassQty > 0 && (
+                          <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1" onClick={e => e.preventDefault()}>
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(Math.max(1, aviationFirstClassQty - 1)); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">-</button>
+                            <span className="text-sm w-4 text-center font-bold">{aviationFirstClassQty}</span>
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(aviationFirstClassQty + 1); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">+</button>
+                          </div>
+                        )}
                       </label>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-700">
-                      <span className="text-sm text-slate-300 font-medium">Quantity</span>
-                      <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1">
-                        <button onClick={() => setAviationQty(Math.max(1, aviationQty - 1))} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">-</button>
-                        <span className="text-sm w-4 text-center font-bold">{aviationQty}</span>
-                        <button onClick={() => setAviationQty(aviationQty + 1)} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">+</button>
-                      </div>
                     </div>
 
                     <p className="text-xs text-cyan-300 bg-cyan-900/30 p-2.5 rounded-lg border border-cyan-500/30 text-center leading-relaxed">
