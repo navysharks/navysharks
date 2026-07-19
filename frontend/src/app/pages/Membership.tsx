@@ -47,6 +47,7 @@ export function Membership() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isEliteModalOpen, setIsEliteModalOpen] = useState(false);
+  const [isAviationModalOpen, setIsAviationModalOpen] = useState(false);
   const [currency, setCurrency] = useState<"USD" | "EUR" | "AUD">("USD");
   const [userToken, setUserToken] = useState<string | null>(null);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
@@ -61,6 +62,10 @@ export function Membership() {
         setTimeout(() => setShowEliteMessage(false), 4000);
         return;
       }
+    }
+    if (addonId === 'aviation') {
+      setIsAviationModalOpen(true);
+      return;
     }
     
     setSelectedAddons(prev => {
@@ -1563,87 +1568,21 @@ export function Membership() {
             </div>
 
             <div 
-              onClick={() => {
-                if (!selectedAddons.includes('aviation')) handleAddonClick('aviation');
-              }}
-              className={`bg-slate-800 p-6 rounded-xl border text-center transition-all ${
-                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50 cursor-default' : 'border-slate-700 hover:border-slate-500 cursor-pointer'
+              onClick={() => handleAddonClick('aviation')}
+              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
               }`}
             >
-              {!selectedAddons.includes('aviation') ? (
-                <>
-                  <div className="text-2xl font-bold text-cyan-400 mb-2">
-                    +$349
-                  </div>
-                  <h3 className="font-semibold mb-2">
-                    Aviation Credit
-                  </h3>
-                  <p className="text-sm text-slate-400">
-                    Helicopters + jets <br />
-                    Helicopter transfers starting from 349*
-                  </p>
-                </>
-              ) : (
-                <div className="text-left animate-in fade-in zoom-in duration-300">
-                  <div className="flex justify-between items-center mb-4 border-b border-slate-600 pb-2">
-                    <h3 className="font-semibold text-lg text-cyan-400">Aviation Credit</h3>
-                    <button onClick={(e) => { e.stopPropagation(); handleAddonClick('aviation'); }} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-1 border border-slate-600">
-                      <X size={14} />
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="flex flex-col gap-2">
-                      <label className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${aviationStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
-                        <div className="flex items-center gap-3">
-                          <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationStandardQty > 0} onChange={() => setAviationStandardQty(prev => prev > 0 ? 0 : 1)} />
-                          <span className="text-sm font-medium">Standard Credit ($349*)</span>
-                        </div>
-                        {aviationStandardQty > 0 && (
-                          <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1" onClick={e => e.preventDefault()}>
-                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(Math.max(1, aviationStandardQty - 1)); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">-</button>
-                            <span className="text-sm w-4 text-center font-bold">{aviationStandardQty}</span>
-                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(aviationStandardQty + 1); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">+</button>
-                          </div>
-                        )}
-                      </label>
-                      
-                      <label className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${aviationFirstClassQty > 0 ? 'border-cyan-400 bg-cyan-900/20' : 'border-slate-600 bg-slate-800 hover:border-slate-400'}`}>
-                        <div className="flex items-center gap-3">
-                          <input type="checkbox" className="accent-cyan-400 w-4 h-4" checked={aviationFirstClassQty > 0} onChange={() => setAviationFirstClassQty(prev => prev > 0 ? 0 : 1)} />
-                          <span className="text-sm font-medium">First Class Flyer Credit ($999*)</span>
-                        </div>
-                        {aviationFirstClassQty > 0 && (
-                          <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1" onClick={e => e.preventDefault()}>
-                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(Math.max(1, aviationFirstClassQty - 1)); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">-</button>
-                            <span className="text-sm w-4 text-center font-bold">{aviationFirstClassQty}</span>
-                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(aviationFirstClassQty + 1); }} className="w-7 h-7 flex items-center justify-center hover:bg-slate-700 rounded text-slate-300 transition-colors">+</button>
-                          </div>
-                        )}
-                      </label>
-                    </div>
-
-                    <p className="text-xs text-cyan-300 bg-cyan-900/30 p-2.5 rounded-lg border border-cyan-500/30 text-center leading-relaxed">
-                      All bought credit can be used for all aviation services
-                    </p>
-
-                    {(aviationStandardQty > 0 || aviationFirstClassQty > 0) && (
-                      <div className="pt-2">
-                        <button 
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            // Can add specific add-to-cart logic here in the future
-                          }}
-                          className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-between shadow-lg shadow-cyan-500/20"
-                        >
-                          <span>Add to cart</span>
-                          <span>${((aviationStandardQty * 349) + (aviationFirstClassQty * 999)).toLocaleString()}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              <div className="text-2xl font-bold text-cyan-400 mb-2">
+                +$349
+              </div>
+              <h3 className="font-semibold mb-2">
+                Aviation Credit
+              </h3>
+              <p className="text-sm text-slate-400">
+                Helicopters + jets <br />
+                Helicopter transfers starting from 349*
+              </p>
             </div>
 
             <div 
@@ -2059,6 +1998,73 @@ export function Membership() {
         onClose={() => setIsEliteModalOpen(false)}
         onComplete={handleEliteCheckoutComplete}
       />
+
+      {/* Aviation Modal */}
+      {isAviationModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
+              <h3 className="font-bold text-xl text-cyan-400">Aviation Credit</h3>
+              <button onClick={() => setIsAviationModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${aviationStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={aviationStandardQty > 0} onChange={() => setAviationStandardQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Standard Credit ($349*)</span>
+                  </div>
+                  {aviationStandardQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(Math.max(1, aviationStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{aviationStandardQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(aviationStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+                
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${aviationFirstClassQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={aviationFirstClassQty > 0} onChange={() => setAviationFirstClassQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">First Class Flyer ($999*)</span>
+                  </div>
+                  {aviationFirstClassQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(Math.max(1, aviationFirstClassQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{aviationFirstClassQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(aviationFirstClassQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for all aviation services
+              </p>
+
+              {(aviationStandardQty > 0 || aviationFirstClassQty > 0) && (
+                <div className="pt-4">
+                  <button 
+                    onClick={() => { 
+                      if (!selectedAddons.includes('aviation')) {
+                        setSelectedAddons([...selectedAddons, 'aviation']);
+                      }
+                      setIsAviationModalOpen(false);
+                    }}
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
+                  >
+                    <span className="text-lg">Add to cart</span>
+                    <span className="text-lg">${((aviationStandardQty * 349) + (aviationFirstClassQty * 999)).toLocaleString()}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
