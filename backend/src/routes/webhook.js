@@ -3,6 +3,7 @@ const stripe = require('../stripe');
 const { db } = require('../firebase');
 const { FieldValue } = require('firebase-admin/firestore');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const router = express.Router();
 
@@ -125,8 +126,9 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
                 }
               }
 
-              // 2. Create a single-use Promotion Code
-              const generatedCode = `ELITE-VIP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+              // 2. Create a single-use Promotion Code (Cryptographically secure)
+              const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
+              const generatedCode = `ELITE-VIP-${randomSuffix}`;
               const promotionCode = await stripe.promotionCodes.create({
                 coupon: COUPON_ID,
                 code: generatedCode,

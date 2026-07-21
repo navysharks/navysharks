@@ -733,7 +733,11 @@ export function Dashboard() {
       {showClaimModal && (        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-8 relative shadow-2xl flex flex-col items-center">
             <button
-              onClick={() => setShowClaimModal(false)}
+              onClick={() => {
+                setShowClaimModal(false);
+                setPromoCode(null);
+                setCopiedToken(null);
+              }}
               className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />

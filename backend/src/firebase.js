@@ -20,6 +20,7 @@ try {
   }
 } catch (error) {
   console.error('Error initializing Firebase Admin:', error);
+  throw new Error('Failed to initialize Firebase Admin SDK. Please check your service account key or environment.');
 }
 
 const db = getFirestore(app, "default");

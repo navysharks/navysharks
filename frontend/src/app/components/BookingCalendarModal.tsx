@@ -160,7 +160,7 @@ export function BookingCalendarModal({
           </button>
           <p className="text-xs text-center text-slate-500 mt-4 flex items-center justify-center gap-1">
             <span className="w-2 h-2 rounded-full bg-cyan-500 inline-block"></span>
-            Syncs seamlessly with Google Calendar
+            Select your preferred dates
           </p>
         </div>
       </div>

@@ -1,6 +1,5 @@
 const express = require('express');
 const stripe = require('../stripe');
-const { db } = require('../firebase');
 const { verifyToken } = require('../middleware/auth');
 const router = express.Router();
 
