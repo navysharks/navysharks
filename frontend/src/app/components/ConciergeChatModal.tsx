@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { X, Send, User, Shield, Loader2 } from "lucide-react";
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -24,6 +25,14 @@ export function ConciergeChatModal({
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const botTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // W7: Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (botTimeoutRef.current) clearTimeout(botTimeoutRef.current);
+    };
+  }, []);
 
   // Scroll to bottom when messages change
   const scrollToBottom = () => {
@@ -62,23 +71,34 @@ export function ConciergeChatModal({
 
     const messagesRef = collection(db, "chats", userId, "messages");
     
-    // Add User Message
-    await addDoc(messagesRef, {
-      text: textToSend,
-      senderId: userId,
-      isConcierge: false,
-      createdAt: serverTimestamp(),
-    });
-
-    // Automated acknowledgment — concierge team responds via admin dashboard
-    setTimeout(async () => {
+    try {
+      // Add User Message
       await addDoc(messagesRef, {
-        text: "Thank you for reaching out. A dedicated lifestyle manager is reviewing your request and will assist you shortly.",
-        senderId: "concierge-bot",
-        isConcierge: true,
+        text: textToSend,
+        senderId: userId,
+        isConcierge: false,
         createdAt: serverTimestamp(),
       });
-    }, 1500);
+
+      // W7: Store timeout in ref so it can be cleared
+      botTimeoutRef.current = setTimeout(async () => {
+        try {
+          await addDoc(messagesRef, {
+            text: "Thank you for reaching out. A dedicated lifestyle manager is reviewing your request and will assist you shortly.",
+            senderId: "concierge-bot",
+            isConcierge: true,
+            createdAt: serverTimestamp(),
+          });
+        } catch (e) {
+          console.error("Failed to send automated reply", e);
+        }
+      }, 1500);
+    } catch (error) {
+      // W8: Handle failure
+      console.error("Failed to send message", error);
+      toast.error("Failed to send message. Please try again.");
+      setNewMessage(textToSend); // Restore user's draft
+    }
   };
 
   if (!isOpen) return null;

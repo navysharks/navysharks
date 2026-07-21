@@ -14,6 +14,8 @@ export interface UserData {
   stripeSessionId?: string;
   stripeCustomerId?: string;
   rfidCode?: string;
+  cardStatus?: string;
+  upgradeTokens?: string[];
   createdAt: Timestamp | Date;
 }
 
@@ -50,16 +52,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           async (snapshot) => {
             if (snapshot.exists()) {
               const data = snapshot.data() as Partial<UserData>;
-              // If the backend webhook created the document first, it might be missing name/email
-              if (!data.name || !data.email) {
+              // W10: Guard against infinite loop if email is empty string.
+              // Check if name or email are strictly undefined, or if we need to set defaults.
+              const needsName = data.name === undefined || data.name === "";
+              const needsEmail = data.email === undefined; // Empty string is a valid fallback for email
+
+              if (needsName || needsEmail) {
                 const mergedData = {
                   ...data,
-                  name: data.name || currentUser.displayName || currentUser.email?.split("@")[0] || "Member",
-                  email: data.email || currentUser.email || "",
+                  name: data.name || currentUser.displayName || (currentUser.email ? currentUser.email.split("@")[0] : "Member"),
+                  email: data.email ?? currentUser.email ?? "",
                   role: data.role || "user",
                   createdAt: data.createdAt || new Date(),
                 };
-                await setDoc(userDocRef, mergedData, { merge: true });
+                
+                // Only write if something actually changed to prevent loop
+                if (mergedData.name !== data.name || mergedData.email !== data.email) {
+                  await setDoc(userDocRef, mergedData, { merge: true });
+                }
                 setUserData(mergedData as UserData);
               } else {
                 setUserData(data as UserData);

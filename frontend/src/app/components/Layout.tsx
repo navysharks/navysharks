@@ -14,7 +14,8 @@ export function Layout() {
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/destinations", label: "Destinations" },
-    { path: "/membership", label: "Experiences" },
+    { path: "/experiences", label: "Experiences" },
+    { path: "/membership", label: "Membership" },
     { path: "/partners", label: "Partners" },
     { path: "/contact", label: "Contact" },
   ];

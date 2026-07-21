@@ -8,7 +8,7 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
     // Use the authenticated user's UID instead of trusting the request body
     const userId = req.user.uid;
     const userEmail = req.user.email || req.body.userEmail;
-    const { verificationSessionId } = req.body;
+    const { verificationSessionId, billingPlan } = req.body;
 
     // --- Server-side Identity Verification Check ---
     // A verificationSessionId is REQUIRED. Without it, we cannot confirm the user
@@ -18,6 +18,17 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
         error: 'Identity verification is required before purchasing Elite Membership.' 
       });
     }
+
+    // Validate billingPlan
+    const validPlans = ['yearly', 'monthly'];
+    const plan = validPlans.includes(billingPlan) ? billingPlan : 'yearly';
+
+    // Pricing: yearly = $245.00, monthly = $49.00
+    const priceMap = {
+      yearly: { amount: 24500, label: 'Yearly ($245/year)' },
+      monthly: { amount: 4900, label: 'Monthly ($49/month)' },
+    };
+    const selectedPrice = priceMap[plan];
 
     // Retrieve the session from Stripe to confirm its real status.
     // This prevents URL spoofing (e.g. ?verification_session_id=fake).
@@ -38,9 +49,9 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
             currency: 'usd',
             product_data: {
               name: 'Navy Sharks Elite Membership',
-              description: 'Exclusive access to premium concierge services, vetted safe zones, and curated lifestyle experiences.',
+              description: `${selectedPrice.label} — Exclusive access to premium concierge services, vetted safe zones, and curated lifestyle experiences.`,
             },
-            unit_amount: 490000, // $4,900.00 in cents
+            unit_amount: selectedPrice.amount,
           },
           quantity: 1,
         },
@@ -49,6 +60,7 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
       // Use the verified UID from the token, not from the body
       client_reference_id: userId,
       customer_email: userEmail,
+      metadata: { billingPlan: plan },
       success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/membership?canceled=true`,
     });
@@ -75,6 +87,14 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       "VIP Weekend Access": 98000,
       "Luxe Escape Experience": 129000,
       "Yacht & River Elite": 165000,
+      "Yacht & Island Elite": 165000,
+      "Medellín Lifestyle Weekend": 78000,
+      "Cartagena Luxe Escape": 115000,
+      "Caribbean Yacht Experience": 155000,
+      "Rio Beach & Night": 92000,
+      "São Paulo Luxe Experience": 125000,
+      "Beach Yacht Elite": 175000,
+      // Keep old names just in case
       "Explorer's Paradise": 78000,
       "Ultimate Island Experience": 115000,
       "Private Yacht Expedition": 155000,
@@ -146,7 +166,13 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
         type: 'bundle',
         bundleName: bundleName,
         date: date,
-        addons: addons ? JSON.stringify(addons) : "[]",
+        // W14: Minify addons to fit strictly under Stripe's 500-char metadata limit
+        addons: addons ? JSON.stringify(
+          addons.map(a => ({ 
+            id: typeof a === 'string' ? a : a.id, 
+            quantity: typeof a === 'string' ? 1 : a.quantity || 1 
+          }))
+        ) : "[]",
       },
       success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/success?session_id={CHECKOUT_SESSION_ID}&type=bundle`,
       cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/membership?canceled=true`,

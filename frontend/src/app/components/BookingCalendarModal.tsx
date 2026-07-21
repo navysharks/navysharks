@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 
 interface BookingCalendarModalProps {
@@ -16,6 +16,14 @@ export function BookingCalendarModal({
 }: BookingCalendarModalProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  // W9: Reset date on reopen
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedDate(null);
+      setCurrentDate(new Date());
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

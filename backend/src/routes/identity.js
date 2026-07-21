@@ -26,8 +26,7 @@ router.post('/create-verification-session', verifyToken, async (req, res) => {
 
     res.json({ 
       id: verificationSession.id,
-      url: verificationSession.url,
-      client_secret: verificationSession.client_secret 
+      url: verificationSession.url
     });
   } catch (error) {
     console.error('Error creating identity verification session:', error);

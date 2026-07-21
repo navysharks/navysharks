@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Home } from "./pages/Home";
 import { Destinations } from "./pages/Destinations";
+import { Experiences } from "./pages/Experiences";
 import { Membership } from "./pages/Membership";
 import { Partners } from "./pages/Partners";
 import { Contact } from "./pages/Contact";
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: "destinations", Component: Destinations },
+      { path: "experiences", Component: Experiences },
       { path: "membership", Component: Membership },
       { path: "partners", Component: Partners },
       { path: "contact", Component: Contact },

@@ -3,6 +3,8 @@ import { X, User, Mail, Phone, Camera, CreditCard, CheckCircle2, ScanFace, Uploa
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 interface EliteMembershipModalProps {
   isOpen: boolean;
@@ -20,10 +22,30 @@ export function EliteMembershipModal({
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Controlled form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [phone, setPhone] = useState("");
+  const [telegram, setTelegram] = useState("");
+
   if (!isOpen) return null;
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Save form data to Firestore immediately before redirect
+    if (user) {
+      try {
+        await setDoc(doc(db, "users", user.uid), {
+          applicationData: { firstName, lastName, email, gender, whatsapp, phone, telegram },
+          applicationSubmittedAt: new Date(),
+        }, { merge: true });
+      } catch (err) {
+        console.error("Failed to save application data", err);
+      }
+    }
     setStep("verification");
   };
 
@@ -132,6 +154,8 @@ export function EliteMembershipModal({
                       <input
                         required
                         type="text"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-yellow-500 transition-colors"
                         placeholder="John"
                       />
@@ -142,6 +166,8 @@ export function EliteMembershipModal({
                     <input
                       required
                       type="text"
+                      value={lastName}
+                      onChange={e => setLastName(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-yellow-500 transition-colors"
                       placeholder="Doe"
                     />
@@ -158,6 +184,8 @@ export function EliteMembershipModal({
                       <input
                         required
                         type="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-yellow-500 transition-colors"
                         placeholder="john@example.com"
                       />
@@ -165,7 +193,7 @@ export function EliteMembershipModal({
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Gender *</label>
-                    <select required className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-yellow-500 transition-colors appearance-none">
+                    <select required value={gender} onChange={e => setGender(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-yellow-500 transition-colors appearance-none">
                       <option value="" disabled>Select Gender</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
@@ -183,6 +211,8 @@ export function EliteMembershipModal({
                     <input
                       required
                       type="tel"
+                      value={whatsapp}
+                      onChange={e => setWhatsapp(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-yellow-500 transition-colors"
                       placeholder="+1 (555) 000-0000"
                     />
@@ -199,6 +229,8 @@ export function EliteMembershipModal({
                       </div>
                       <input
                         type="tel"
+                        value={phone}
+                        onChange={e => setPhone(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-yellow-500 transition-colors"
                         placeholder="Phone Number"
                       />
@@ -212,6 +244,8 @@ export function EliteMembershipModal({
                       </div>
                       <input
                         type="text"
+                        value={telegram}
+                        onChange={e => setTelegram(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-yellow-500 transition-colors"
                         placeholder="@username"
                       />

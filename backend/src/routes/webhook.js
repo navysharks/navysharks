@@ -1,6 +1,7 @@
 const express = require('express');
 const stripe = require('../stripe');
 const { db } = require('../firebase');
+const { FieldValue } = require('firebase-admin/firestore');
 const nodemailer = require('nodemailer');
 
 const router = express.Router();
@@ -23,7 +24,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
   let event;
 
   try {
-    const payload = req.rawBody || req.body;
+    const payload = req.body;
     event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
   } catch (err) {
     console.error(`Webhook Error: ${err.message}`);
@@ -32,7 +33,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
 
   // Handle the event
   switch (event.type) {
-    case 'checkout.session.completed':
+    case 'checkout.session.completed': {
       const session = event.data.object;
       const userId = session.client_reference_id;
 
@@ -103,13 +104,53 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
               }
             }
           } else {
+            // Generate a Stripe Promotion Code for the $500 VIP Upgrade Perk
+            let promoCode = null;
+            try {
+              // 1. Ensure the "$500 OFF VIP UPGRADE" coupon exists
+              const COUPON_ID = 'vip-upgrade-500';
+              try {
+                await stripe.coupons.retrieve(COUPON_ID);
+              } catch (e) {
+                if (e.code === 'resource_missing') {
+                  await stripe.coupons.create({
+                    id: COUPON_ID,
+                    name: '$500 VIP Upgrade Discount',
+                    amount_off: 50000, // $500.00
+                    currency: 'usd',
+                    duration: 'once',
+                  });
+                } else {
+                  throw e;
+                }
+              }
+
+              // 2. Create a single-use Promotion Code
+              const generatedCode = `ELITE-VIP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+              const promotionCode = await stripe.promotionCodes.create({
+                coupon: COUPON_ID,
+                code: generatedCode,
+                max_redemptions: 1,
+              });
+              
+              promoCode = promotionCode.code;
+            } catch (stripeError) {
+              console.error('Error generating promo code in Stripe:', stripeError);
+            }
+
             // Default: Update the user's document in Firestore to reflect Elite Membership
-            await db.collection('users').doc(userId).set({
+            const updateData = {
               membershipStatus: 'Elite',
               membershipPurchaseDate: new Date(),
               stripeSessionId: session.id,
               stripeCustomerId: session.customer,
-            }, { merge: true });
+            };
+            
+            if (promoCode) {
+              updateData.upgradeTokens = FieldValue.arrayUnion(promoCode);
+            }
+
+            await db.collection('users').doc(userId).set(updateData, { merge: true });
             // User upgraded to Elite Member
           }
         } catch (dbError) {
@@ -119,6 +160,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
         console.warn('No client_reference_id found in session. Could not update user in Firebase.');
       }
       break;
+    }
       
     // Handle other event types if necessary
     default:

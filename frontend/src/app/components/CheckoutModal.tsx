@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, User, Mail, Phone, Camera, CreditCard, CheckCircle2, ScanFace, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+
+interface GuestDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
 
 interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (addons: string[]) => void;
+  onComplete: (addons: string[], guestDetails: GuestDetails) => void;
   selectedDate: Date | null;
   bundleName: string;
   bundlePrice: string;
   userToken: string | null;
+  onBeforeRedirect?: (addons: string[]) => void;
 }
 
 export function CheckoutModal({
@@ -20,10 +28,30 @@ export function CheckoutModal({
   bundleName,
   bundlePrice,
   userToken,
+  onBeforeRedirect,
 }: CheckoutModalProps) {
   const [step, setStep] = useState<"details" | "addons" | "verification">("details");
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [verificationStatus, setVerificationStatus] = useState<"pending" | "scanning" | "success">("pending");
+
+  // Controlled guest detail fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  // W6: Reset state on reopen
+  useEffect(() => {
+    if (isOpen) {
+      setStep("details");
+      setSelectedAddons([]);
+      setVerificationStatus("pending");
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone("");
+    }
+  }, [isOpen]);
 
   const addonsList = [
     { id: "helicopter", name: "Helicopter Airport Transfer", price: 380, icon: "🚁" },
@@ -43,7 +71,7 @@ export function CheckoutModal({
   };
 
   const handleNextAddons = () => {
-    setStep("verification");
+    onComplete(selectedAddons, { firstName, lastName, email, phone });
   };
 
   const handleStartVerification = async () => {
@@ -65,6 +93,9 @@ export function CheckoutModal({
       );
       const data = await response.json();
       if (data.url) {
+        if (onBeforeRedirect) {
+          onBeforeRedirect(selectedAddons);
+        }
         // Redirect to Stripe Identity verification page
         window.location.href = data.url;
       } else {
@@ -141,21 +172,25 @@ export function CheckoutModal({
                         <User className="h-5 w-5 text-slate-500" />
                       </div>
                       <input
-                        required
-                        type="text"
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                        placeholder="John"
-                      />
+                         required
+                         type="text"
+                         value={firstName}
+                         onChange={e => setFirstName(e.target.value)}
+                         className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                         placeholder="John"
+                       />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Last Name</label>
-                    <input
-                      required
-                      type="text"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                      placeholder="Doe"
-                    />
+                     <input
+                     required
+                     type="text"
+                     value={lastName}
+                     onChange={e => setLastName(e.target.value)}
+                     className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                     placeholder="Doe"
+                   />
                   </div>
                 </div>
 
@@ -168,6 +203,8 @@ export function CheckoutModal({
                     <input
                       required
                       type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                       placeholder="john@example.com"
                     />
@@ -183,6 +220,8 @@ export function CheckoutModal({
                     <input
                       required
                       type="tel"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                       placeholder="+1 (555) 000-0000"
                     />

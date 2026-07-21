@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { Shield, MapPin, Award, Users, ChevronRight, Star } from "lucide-react";
 import videoBackground from "../../imports/small_optimized.mp4";
-import thailandBackground from "../../imports/thailand-background.png";
-import philippinesBackground from "../../imports/philippines-background.png";
 import { homeDestinationsComingSoonBackgrounds } from "../comingSoonBackgrounds";
 
 import thailandBangkok from "../../assets/Thailand/Bangkok.jpg";
@@ -55,7 +53,9 @@ function DestinationCard({ dest }: { dest: any }) {
         )}
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <h3 className="text-2xl font-bold mb-2">{dest.name}</h3>
-          <p className="text-cyan-400">{dest.highlight}</p>
+          <p className={`text-cyan-400 ${dest.comingSoon ? 'blur-sm opacity-50 select-none' : ''}`}>
+            {dest.highlight}
+          </p>
         </div>
       </div>
     </div>
@@ -279,7 +279,7 @@ export function Home() {
                 <Star className="w-5 h-5 fill-current" />
               </div>
               <p className="text-slate-300 italic mb-6">
-                "The Bangkok Genesis bundle exceeded every expectation. The VIP nightclub access alone paid for itself. Navy Sharks handled everything seamlessly."
+                "The Bangkok bundle exceeded every expectation. The VIP nightclub access alone paid for itself. Navy Sharks handled everything seamlessly."
               </p>
               <div>
                 <h4 className="font-bold text-white">James W.</h4>

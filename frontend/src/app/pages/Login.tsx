@@ -82,7 +82,11 @@ export function Login() {
                       await sendPasswordResetEmail(auth, email);
                       toast.success("Password reset email sent! Check your inbox.");
                     } catch (err: any) {
-                      toast.error(err.message || "Failed to send reset email.");
+                      if (err.message?.includes('has-been-suspended') || err.message?.includes('permission-denied')) {
+                        toast.error("System error: Authentication service is currently unavailable. Please contact the administrator.");
+                      } else {
+                        toast.error("Failed to send reset email. Please try again later.");
+                      }
                     }
                   }}
                   className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"

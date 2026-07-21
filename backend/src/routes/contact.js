@@ -2,6 +2,11 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const router = express.Router();
 
+// W16: Startup check for Gmail app password
+if (!process.env.GMAIL_APP_PASSWORD) {
+  console.warn('[WARNING] GMAIL_APP_PASSWORD is not set. Contact form emails will fail to send.');
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   return str
@@ -29,7 +34,8 @@ router.post('/', async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"${name}" <${email}>`, 
+      // W15: Gmail requires 'from' to match the authenticated user
+      from: `"Navy Sharks Contact" <${process.env.GMAIL_USER || 'adminnavysharks@gmail.com'}>`, 
       to: process.env.GMAIL_USER || 'adminnavysharks@gmail.com', // Receive email at this address
       replyTo: email, // This allows you to reply directly to the sender
       subject: `[Navy Sharks Contact] ${subject}`,
