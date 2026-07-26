@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from "react-router";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { ErrorBoundary } from "./ErrorBoundary";
 import logoUrl from "../../assets/logo_optimized.webp";
@@ -10,6 +10,10 @@ export function Layout() {
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const navLinks = [
     { path: "/", label: "Home" },
