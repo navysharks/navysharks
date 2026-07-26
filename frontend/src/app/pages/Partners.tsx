@@ -1,5 +1,6 @@
 import { Hotel, Utensils, Music, Anchor, Lock, Unlock, Crown } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 
 export function Partners() {
@@ -365,12 +366,12 @@ export function Partners() {
             Join Navy Sharks today and start enjoying exclusive benefits at
             premium venues across all four destinations
           </p>
-          <a
-            href="/membership"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-full hover:from-cyan-600 hover:to-blue-700 transition-all"
+          <Link
+            to="/membership"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-full hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg shadow-cyan-500/20"
           >
             Become a Member
-          </a>
+          </Link>
         </div>
       </section>
     </div>

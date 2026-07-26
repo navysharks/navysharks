@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
 import { MapPin, Shield, Utensils } from "lucide-react";
 import thailandBackground from "../../imports/thailand-background.png";
 import philippinesBackground from "../../imports/philippines-background.png";
@@ -237,12 +238,12 @@ export function Destinations() {
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
             Choose from curated experience packages starting from $780 per person
           </p>
-          <a
-            href="/membership"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-full hover:from-cyan-600 hover:to-blue-700 transition-all"
+          <Link
+            to="/experiences"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-full hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg shadow-cyan-500/20"
           >
             View Experience Packages
-          </a>
+          </Link>
         </div>
       </section>
     </div>
