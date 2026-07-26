@@ -170,7 +170,7 @@ export function Partners() {
             )}
 
             {/* Country Selector */}
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-3 justify-center max-w-md sm:max-w-none mx-auto">
               {[
                 { id: "all", label: "All Destinations" },
                 { id: "Thailand", label: "Thailand" },
@@ -181,7 +181,9 @@ export function Partners() {
                 <button
                   key={country.id}
                   onClick={() => setSelectedCountry(country.id)}
-                  className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 ${
+                  className={`w-full sm:w-auto text-center px-4 py-2.5 sm:px-6 rounded-xl sm:rounded-full font-semibold text-sm transition-all duration-300 ${
+                    country.id === "all" ? "col-span-2 sm:col-span-1" : ""
+                  } ${
                     selectedCountry === country.id
                       ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20"
                       : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700/50"
@@ -198,21 +200,21 @@ export function Partners() {
       {/* Category Tabs */}
       <section className="py-6 border-y border-slate-800/50 sticky top-20 bg-slate-950/80 backdrop-blur-xl z-40">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-4 justify-center max-w-md sm:max-w-none mx-auto">
             {categories.map((cat) => {
               const Icon = cat.icon;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center gap-2.5 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`flex items-center justify-center sm:justify-start gap-2 sm:gap-2.5 px-3 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-xs sm:text-base transition-all duration-300 ${
                     activeCategory === cat.id
-                      ? "bg-cyan-500/10 border-b-2 border-cyan-500 text-cyan-400"
-                      : "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                      ? "bg-cyan-500/15 border border-cyan-500 text-cyan-400 shadow-md shadow-cyan-500/10"
+                      : "bg-slate-900/80 sm:bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-slate-800/80 sm:border-transparent"
                   }`}
                 >
-                  <Icon size={18} />
-                  {cat.label}
+                  <Icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" />
+                  <span className="truncate">{cat.label}</span>
                 </button>
               );
             })}
