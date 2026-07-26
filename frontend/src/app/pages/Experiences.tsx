@@ -377,7 +377,7 @@ export function Experiences() {
       {/* Destination Selector & Currency Toggle */}
       <section className="py-8 border-y border-slate-800 bg-slate-950 relative">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-4 w-full sm:w-auto justify-center md:justify-start">
             {Object.keys(destinations).map((key) => {
               const dest =
                 destinations[key as keyof typeof destinations];
@@ -385,10 +385,10 @@ export function Experiences() {
                 <button
                   key={key}
                   onClick={() => setSelectedDestination(key)}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                  className={`w-full sm:w-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-full font-semibold text-sm sm:text-base transition-all ${
                     selectedDestination === key
-                      ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20"
+                      : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/50"
                   }`}
                 >
                   {dest.name}
@@ -397,24 +397,26 @@ export function Experiences() {
             })}
           </div>
 
-          <div className="flex bg-slate-900 rounded-full p-1 border border-slate-800">
-            {(["USD", "EUR", "AUD"] as const).map((curr) => (
-              <button
-                key={curr}
-                onClick={() => setCurrency(curr)}
-                className={`px-4 py-2 rounded-full font-semibold text-sm transition-all ${
-                  currency === curr
-                    ? "bg-slate-700 text-white"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                {curr}
-              </button>
-            ))}
+          <div className="flex flex-col items-center md:items-end w-full sm:w-auto pt-2 md:pt-0 border-t border-slate-800/80 md:border-t-0">
+            <div className="flex bg-slate-900 rounded-full p-1 border border-slate-800">
+              {(["USD", "EUR", "AUD"] as const).map((curr) => (
+                <button
+                  key={curr}
+                  onClick={() => setCurrency(curr)}
+                  className={`px-5 py-2 rounded-full font-semibold text-sm transition-all ${
+                    currency === curr
+                      ? "bg-slate-700 text-white shadow-sm"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {curr}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-2 text-center md:text-right">
+              * Exchange rates are approximate. Final charge will be in USD.
+            </p>
           </div>
-          <p className="text-xs text-slate-500 mt-3 text-center">
-            * Exchange rates are approximate. Final charge will be in USD.
-          </p>
         </div>
       </section>
 
