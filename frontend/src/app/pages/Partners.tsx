@@ -198,7 +198,7 @@ export function Partners() {
       </section>
 
       {/* Category Tabs */}
-      <section className="py-6 border-y border-slate-800/50 sticky top-20 bg-slate-950/80 backdrop-blur-xl z-40">
+      <section className="py-3 sm:py-6 border-y border-slate-800/80 sticky top-28 bg-slate-950/95 backdrop-blur-xl z-40 shadow-xl shadow-slate-950/50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-4 justify-center max-w-md sm:max-w-none mx-auto">
             {categories.map((cat) => {
