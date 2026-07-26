@@ -8,11 +8,10 @@ const crypto = require('crypto');
 const router = express.Router();
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-  port: process.env.SMTP_PORT || 587,
+  service: 'gmail',
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.GMAIL_USER || 'adminnavysharks@gmail.com',
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
 });
 
@@ -65,10 +64,10 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
 
             // Send confirmation email
             const customerEmail = session.customer_details ? session.customer_details.email : null;
-            if (customerEmail && process.env.SMTP_USER) {
+            if (customerEmail && process.env.GMAIL_APP_PASSWORD) {
               try {
                 await transporter.sendMail({
-                  from: `"Navy Sharks Concierge" <${process.env.SMTP_USER}>`,
+                  from: `"Navy Sharks Concierge" <${process.env.GMAIL_USER || 'adminnavysharks@gmail.com'}>`,
                   to: customerEmail,
                   subject: `Booking Confirmed: ${session.metadata.bundleName}`,
                   html: `
