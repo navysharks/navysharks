@@ -213,7 +213,7 @@ export function Layout() {
               <h3 className="text-white font-semibold mb-4">Contact</h3>
               <div className="space-y-2 text-slate-400 text-sm">
                 <p>support@navysharks.com</p>
-                <p>+1 (555) 123-4567</p>
+                <p>WhatsApp: Members-Only Access</p>
                 <p className="pt-4 text-xs">
                   © 2026 Navy Sharks Concierge Club. All rights reserved.
                 </p>

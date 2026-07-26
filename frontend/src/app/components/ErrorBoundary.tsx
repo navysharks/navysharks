@@ -27,16 +27,17 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8">
-          <div className="bg-red-500/10 border border-red-500 rounded-xl p-6 max-w-2xl w-full">
-            <h2 className="text-red-500 font-bold text-xl mb-4">Something went wrong.</h2>
-            <pre className="text-red-400 text-sm overflow-auto whitespace-pre-wrap font-mono">
-              {this.state.error?.toString()}
-              {'\n\n'}
-              {this.state.error?.stack}
-            </pre>
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <h2 className="text-white font-bold text-xl mb-2">Something went wrong</h2>
+            <p className="text-slate-400 text-sm mb-6">
+              An unexpected error occurred while loading this page. Please try refreshing or contact our support team if the issue persists.
+            </p>
             <button 
               onClick={() => window.location.reload()} 
-              className="mt-6 px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-700"
+              className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium rounded-xl transition-all shadow-lg shadow-cyan-500/20"
             >
               Reload Page
             </button>

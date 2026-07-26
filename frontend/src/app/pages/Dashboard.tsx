@@ -48,7 +48,7 @@ export function Dashboard() {
           setRfidCode(existingCode);
         } else {
           // Generate new code and save it permanently to Firestore
-          const newCode = `NS-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+          const newCode = `NS-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
           await setDoc(userDocRef, { rfidCode: newCode }, { merge: true });
           setRfidCode(newCode);
         }

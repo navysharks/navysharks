@@ -215,12 +215,7 @@ export function Contact() {
                     <p className="text-slate-400 text-sm mb-2">
                       Mon–Fri, 9am–5pm AEDT (Melbourne)
                     </p>
-                    <a
-                      href="tel:+15551234567"
-                      className="text-cyan-400 hover:text-cyan-300"
-                    >
-                      +1 (555) 123-4567
-                    </a>
+                    <p className="text-cyan-400">Members-only private line</p>
                   </div>
                 </div>
 
