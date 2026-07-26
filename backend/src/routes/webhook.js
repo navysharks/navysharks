@@ -84,9 +84,18 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
                           vip_night: "Extra VIP Nightlife Experience",
                           aviation_standard: "Aviation Standard Credit",
                           aviation_first_class: "Aviation First Class Flyer",
+                          marine_standard: "Marine Standard Credit",
+                          marine_upgrade: "Marine Upgrade (Yacht + Jetski)",
                           marine: "Marine Credit (Yacht + Jetski)",
+                          accommodation_standard: "Accommodation Standard Credit",
+                          accommodation_upgrade: "Accommodation High Roller Patron",
                           accommodation: "Accommodation Credit (Premium Stays)",
+                          club_standard: "Club/Restaurant Standard Credit",
+                          club_upgrade: "Club Michelin Hollywood",
                           club: "Club Credit (Dining & Nightlife)",
+                          transport_standard: "Transport/Security Standard Credit",
+                          transport_upgrade: "Transport Bullet-Proof President",
+                          transport: "Transport/Security Credit",
                         };
                         const name = addonNames[a.id] || a.id;
                         return a.quantity > 1 ? `${name} x${a.quantity}` : name;

@@ -45,16 +45,20 @@ export function Experiences() {
   const [aviationFirstClassQty, setAviationFirstClassQty] = useState(0);
 
   const [isMarineModalOpen, setIsMarineModalOpen] = useState(false);
-  const [marineUpgradeQty, setMarineUpgradeQty] = useState(1);
+  const [marineStandardQty, setMarineStandardQty] = useState(1);
+  const [marineUpgradeQty, setMarineUpgradeQty] = useState(0);
 
   const [isClubModalOpen, setIsClubModalOpen] = useState(false);
-  const [clubMichelinQty, setClubMichelinQty] = useState(1);
+  const [clubStandardQty, setClubStandardQty] = useState(1);
+  const [clubMichelinQty, setClubMichelinQty] = useState(0);
 
   const [isTransportModalOpen, setIsTransportModalOpen] = useState(false);
-  const [transportBulletProofQty, setTransportBulletProofQty] = useState(1);
+  const [transportStandardQty, setTransportStandardQty] = useState(1);
+  const [transportBulletProofQty, setTransportBulletProofQty] = useState(0);
 
   const [isAccommodationModalOpen, setIsAccommodationModalOpen] = useState(false);
-  const [accommodationHighRollerQty, setAccommodationHighRollerQty] = useState(1);
+  const [accommodationStandardQty, setAccommodationStandardQty] = useState(1);
+  const [accommodationHighRollerQty, setAccommodationHighRollerQty] = useState(0);
 
   // Restore state after Stripe Identity redirect
   useEffect(() => {
@@ -73,9 +77,13 @@ export function Experiences() {
           if (parsed.selectedAddons) setSelectedAddons(parsed.selectedAddons);
           if (parsed.aviationStandardQty) setAviationStandardQty(parsed.aviationStandardQty);
           if (parsed.aviationFirstClassQty) setAviationFirstClassQty(parsed.aviationFirstClassQty);
+          if (parsed.marineStandardQty) setMarineStandardQty(parsed.marineStandardQty);
           if (parsed.marineUpgradeQty) setMarineUpgradeQty(parsed.marineUpgradeQty);
+          if (parsed.clubStandardQty) setClubStandardQty(parsed.clubStandardQty);
           if (parsed.clubMichelinQty) setClubMichelinQty(parsed.clubMichelinQty);
+          if (parsed.transportStandardQty) setTransportStandardQty(parsed.transportStandardQty);
           if (parsed.transportBulletProofQty) setTransportBulletProofQty(parsed.transportBulletProofQty);
+          if (parsed.accommodationStandardQty) setAccommodationStandardQty(parsed.accommodationStandardQty);
           if (parsed.accommodationHighRollerQty) setAccommodationHighRollerQty(parsed.accommodationHighRollerQty);
 
           // BUG FIX #4: Use parsed values DIRECTLY for the API call instead of
@@ -87,20 +95,36 @@ export function Experiences() {
           const restoredModalAddons: string[] = parsed.modalAddons || [];
           const restoredAviationStd = parsed.aviationStandardQty || 0;
           const restoredAviationFirst = parsed.aviationFirstClassQty || 0;
-          const restoredMarine = parsed.marineUpgradeQty || 1;
-          const restoredClub = parsed.clubMichelinQty || 1;
-          const restoredTransport = parsed.transportBulletProofQty || 1;
-          const restoredAccommodation = parsed.accommodationHighRollerQty || 1;
+          const restoredMarineStd = parsed.marineStandardQty || 0;
+          const restoredMarineUp = parsed.marineUpgradeQty || 0;
+          const restoredClubStd = parsed.clubStandardQty || 0;
+          const restoredClubUp = parsed.clubMichelinQty || 0;
+          const restoredTransportStd = parsed.transportStandardQty || 0;
+          const restoredTransportUp = parsed.transportBulletProofQty || 0;
+          const restoredAccomStd = parsed.accommodationStandardQty || 0;
+          const restoredAccomUp = parsed.accommodationHighRollerQty || 0;
 
           localStorage.removeItem('pendingCheckoutState');
 
           // Build addons payload directly from parsed values
           const finalAddons: any[] = [];
           restoredModalAddons.forEach((id: string) => finalAddons.push({ id, quantity: 1 }));
-          if (restoredAddons.includes('marine')) finalAddons.push({ id: 'marine', quantity: restoredMarine });
-          if (restoredAddons.includes('accommodation')) finalAddons.push({ id: 'accommodation', quantity: restoredAccommodation });
-          if (restoredAddons.includes('club')) finalAddons.push({ id: 'club', quantity: restoredClub });
-          if (restoredAddons.includes('transport')) finalAddons.push({ id: 'transport', quantity: restoredTransport });
+          if (restoredAddons.includes('marine')) {
+            if (restoredMarineStd > 0) finalAddons.push({ id: 'marine_standard', quantity: restoredMarineStd });
+            if (restoredMarineUp > 0) finalAddons.push({ id: 'marine_upgrade', quantity: restoredMarineUp });
+          }
+          if (restoredAddons.includes('accommodation')) {
+            if (restoredAccomStd > 0) finalAddons.push({ id: 'accommodation_standard', quantity: restoredAccomStd });
+            if (restoredAccomUp > 0) finalAddons.push({ id: 'accommodation_upgrade', quantity: restoredAccomUp });
+          }
+          if (restoredAddons.includes('club')) {
+            if (restoredClubStd > 0) finalAddons.push({ id: 'club_standard', quantity: restoredClubStd });
+            if (restoredClubUp > 0) finalAddons.push({ id: 'club_upgrade', quantity: restoredClubUp });
+          }
+          if (restoredAddons.includes('transport')) {
+            if (restoredTransportStd > 0) finalAddons.push({ id: 'transport_standard', quantity: restoredTransportStd });
+            if (restoredTransportUp > 0) finalAddons.push({ id: 'transport_upgrade', quantity: restoredTransportUp });
+          }
           if (restoredAddons.includes('aviation')) {
             if (restoredAviationStd > 0) finalAddons.push({ id: 'aviation_standard', quantity: restoredAviationStd });
             if (restoredAviationFirst > 0) finalAddons.push({ id: 'aviation_first_class', quantity: restoredAviationFirst });
@@ -158,9 +182,13 @@ export function Experiences() {
       selectedAddons,
       aviationStandardQty,
       aviationFirstClassQty,
+      marineStandardQty,
       marineUpgradeQty,
+      clubStandardQty,
       clubMichelinQty,
+      transportStandardQty,
       transportBulletProofQty,
+      accommodationStandardQty,
       accommodationHighRollerQty,
       modalAddons
     }));
@@ -262,10 +290,22 @@ export function Experiences() {
       });
 
       // 2. Add Membership page grid addons with correct quantities
-      if (selectedAddons.includes('marine')) finalAddons.push({ id: 'marine', quantity: marineUpgradeQty });
-      if (selectedAddons.includes('accommodation')) finalAddons.push({ id: 'accommodation', quantity: accommodationHighRollerQty });
-      if (selectedAddons.includes('club')) finalAddons.push({ id: 'club', quantity: clubMichelinQty });
-      if (selectedAddons.includes('transport')) finalAddons.push({ id: 'transport', quantity: transportBulletProofQty });
+      if (selectedAddons.includes('marine')) {
+        if (marineStandardQty > 0) finalAddons.push({ id: 'marine_standard', quantity: marineStandardQty });
+        if (marineUpgradeQty > 0) finalAddons.push({ id: 'marine_upgrade', quantity: marineUpgradeQty });
+      }
+      if (selectedAddons.includes('accommodation')) {
+        if (accommodationStandardQty > 0) finalAddons.push({ id: 'accommodation_standard', quantity: accommodationStandardQty });
+        if (accommodationHighRollerQty > 0) finalAddons.push({ id: 'accommodation_upgrade', quantity: accommodationHighRollerQty });
+      }
+      if (selectedAddons.includes('club')) {
+        if (clubStandardQty > 0) finalAddons.push({ id: 'club_standard', quantity: clubStandardQty });
+        if (clubMichelinQty > 0) finalAddons.push({ id: 'club_upgrade', quantity: clubMichelinQty });
+      }
+      if (selectedAddons.includes('transport')) {
+        if (transportStandardQty > 0) finalAddons.push({ id: 'transport_standard', quantity: transportStandardQty });
+        if (transportBulletProofQty > 0) finalAddons.push({ id: 'transport_upgrade', quantity: transportBulletProofQty });
+      }
       
       if (selectedAddons.includes('aviation')) {
         if (aviationStandardQty > 0) finalAddons.push({ id: 'aviation_standard', quantity: aviationStandardQty });
@@ -1801,10 +1841,24 @@ export function Experiences() {
             
             <div className="space-y-4">
               <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${marineStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={marineStandardQty > 0} onChange={() => setMarineStandardQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Standard Credit ($499*)</span>
+                  </div>
+                  {marineStandardQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineStandardQty(Math.max(1, marineStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{marineStandardQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineStandardQty(marineStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+
                 <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${marineUpgradeQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
                   <div className="flex items-center gap-3">
                     <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={marineUpgradeQty > 0} onChange={() => setMarineUpgradeQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Marine Upgrade ($899)</span>
+                    <span className="text-base font-semibold">Marine Upgrade ($899*)</span>
                   </div>
                   {marineUpgradeQty > 0 && (
                     <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
@@ -1816,7 +1870,11 @@ export function Experiences() {
                 </label>
               </div>
 
-              {marineUpgradeQty > 0 && (
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for all marine services
+              </p>
+
+              {(marineStandardQty > 0 || marineUpgradeQty > 0) && (
                 <div className="pt-4">
                   <button 
                     onClick={() => { 
@@ -1825,13 +1883,13 @@ export function Experiences() {
                       }
                       setIsMarineModalOpen(false);
                       toast.success("Marine Credit added to cart!", {
-                        description: `Total: $${(marineUpgradeQty * 899).toLocaleString()}`
+                        description: `Total: $${((marineStandardQty * 499) + (marineUpgradeQty * 899)).toLocaleString()}`
                       });
                     }}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
                   >
                     <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${(marineUpgradeQty * 899).toLocaleString()}</span>
+                    <span className="text-lg">${((marineStandardQty * 499) + (marineUpgradeQty * 899)).toLocaleString()}</span>
                   </button>
                 </div>
               )}
@@ -1853,10 +1911,24 @@ export function Experiences() {
             
             <div className="space-y-4">
               <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${clubStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={clubStandardQty > 0} onChange={() => setClubStandardQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Standard Credit ($499*)</span>
+                  </div>
+                  {clubStandardQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubStandardQty(Math.max(1, clubStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{clubStandardQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubStandardQty(clubStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+
                 <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${clubMichelinQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
                   <div className="flex items-center gap-3">
                     <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={clubMichelinQty > 0} onChange={() => setClubMichelinQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Michelin Hollywood ($499)</span>
+                    <span className="text-base font-semibold">Michelin Hollywood ($899*)</span>
                   </div>
                   {clubMichelinQty > 0 && (
                     <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
@@ -1868,7 +1940,11 @@ export function Experiences() {
                 </label>
               </div>
 
-              {clubMichelinQty > 0 && (
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for all dining & nightlife services
+              </p>
+
+              {(clubStandardQty > 0 || clubMichelinQty > 0) && (
                 <div className="pt-4">
                   <button 
                     onClick={() => { 
@@ -1877,13 +1953,13 @@ export function Experiences() {
                       }
                       setIsClubModalOpen(false);
                       toast.success("Club Credit added to cart!", {
-                        description: `Total: $${(clubMichelinQty * 499).toLocaleString()}`
+                        description: `Total: $${((clubStandardQty * 499) + (clubMichelinQty * 899)).toLocaleString()}`
                       });
                     }}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
                   >
                     <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${(clubMichelinQty * 499).toLocaleString()}</span>
+                    <span className="text-lg">${((clubStandardQty * 499) + (clubMichelinQty * 899)).toLocaleString()}</span>
                   </button>
                 </div>
               )}
@@ -1905,10 +1981,24 @@ export function Experiences() {
             
             <div className="space-y-4">
               <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${transportStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={transportStandardQty > 0} onChange={() => setTransportStandardQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Standard Credit ($499*)</span>
+                  </div>
+                  {transportStandardQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTransportStandardQty(Math.max(1, transportStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{transportStandardQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTransportStandardQty(transportStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+
                 <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${transportBulletProofQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
                   <div className="flex items-center gap-3">
                     <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={transportBulletProofQty > 0} onChange={() => setTransportBulletProofQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Bullet-Proof President ($799)</span>
+                    <span className="text-base font-semibold">Bullet-Proof President ($799*)</span>
                   </div>
                   {transportBulletProofQty > 0 && (
                     <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
@@ -1920,7 +2010,11 @@ export function Experiences() {
                 </label>
               </div>
 
-              {transportBulletProofQty > 0 && (
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for all transport & security services
+              </p>
+
+              {(transportStandardQty > 0 || transportBulletProofQty > 0) && (
                 <div className="pt-4">
                   <button 
                     onClick={() => { 
@@ -1929,13 +2023,13 @@ export function Experiences() {
                       }
                       setIsTransportModalOpen(false);
                       toast.success("Transport & Security added to cart!", {
-                        description: `Total: $${(transportBulletProofQty * 799).toLocaleString()}`
+                        description: `Total: $${((transportStandardQty * 499) + (transportBulletProofQty * 799)).toLocaleString()}`
                       });
                     }}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
                   >
                     <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${(transportBulletProofQty * 799).toLocaleString()}</span>
+                    <span className="text-lg">${((transportStandardQty * 499) + (transportBulletProofQty * 799)).toLocaleString()}</span>
                   </button>
                 </div>
               )}
@@ -1957,10 +2051,24 @@ export function Experiences() {
             
             <div className="space-y-4">
               <div className="flex flex-col gap-3">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${accommodationStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={accommodationStandardQty > 0} onChange={() => setAccommodationStandardQty(prev => prev > 0 ? 0 : 1)} />
+                    <span className="text-base font-semibold">Standard Credit ($249*)</span>
+                  </div>
+                  {accommodationStandardQty > 0 && (
+                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationStandardQty(Math.max(1, accommodationStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
+                      <span className="text-base w-6 text-center font-bold text-white">{accommodationStandardQty}</span>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationStandardQty(accommodationStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
+                    </div>
+                  )}
+                </label>
+
                 <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${accommodationHighRollerQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
                   <div className="flex items-center gap-3">
                     <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={accommodationHighRollerQty > 0} onChange={() => setAccommodationHighRollerQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">High roller patron ($749)</span>
+                    <span className="text-base font-semibold">High roller patron ($749*)</span>
                   </div>
                   {accommodationHighRollerQty > 0 && (
                     <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
@@ -1972,7 +2080,11 @@ export function Experiences() {
                 </label>
               </div>
 
-              {accommodationHighRollerQty > 0 && (
+              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
+                All bought credit can be used for all accommodation services
+              </p>
+
+              {(accommodationStandardQty > 0 || accommodationHighRollerQty > 0) && (
                 <div className="pt-4">
                   <button 
                     onClick={() => { 
@@ -1981,13 +2093,13 @@ export function Experiences() {
                       }
                       setIsAccommodationModalOpen(false);
                       toast.success("Accommodation Credit added to cart!", {
-                        description: `Total: $${(accommodationHighRollerQty * 749).toLocaleString()}`
+                        description: `Total: $${((accommodationStandardQty * 249) + (accommodationHighRollerQty * 749)).toLocaleString()}`
                       });
                     }}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
                   >
                     <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${(accommodationHighRollerQty * 749).toLocaleString()}</span>
+                    <span className="text-lg">${((accommodationStandardQty * 249) + (accommodationHighRollerQty * 749)).toLocaleString()}</span>
                   </button>
                 </div>
               )}

@@ -128,9 +128,18 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       vip_night: { name: "Extra VIP Nightlife Experience", price: 25000 },
       aviation_standard: { name: "Aviation Standard Credit", price: 34900 },
       aviation_first_class: { name: "Aviation First Class Flyer", price: 99900 },
+      marine_standard: { name: "Marine Standard Credit", price: 49900 },
+      marine_upgrade: { name: "Marine Upgrade (Yacht + Jetski)", price: 89900 },
       marine: { name: "Marine Credit (Yacht + Jetski)", price: 49900 },
+      accommodation_standard: { name: "Accommodation Standard Credit", price: 24900 },
+      accommodation_upgrade: { name: "Accommodation High Roller Patron", price: 74900 },
       accommodation: { name: "Accommodation Credit (Premium Stays)", price: 24900 },
-      club: { name: "Club Credit (Dining & Nightlife)", price: 19900 },
+      club_standard: { name: "Club/Restaurant Standard Credit", price: 49900 },
+      club_upgrade: { name: "Club Michelin Hollywood", price: 89900 },
+      club: { name: "Club Credit (Dining & Nightlife)", price: 49900 },
+      transport_standard: { name: "Transport/Security Standard Credit", price: 49900 },
+      transport_upgrade: { name: "Transport Bullet-Proof President", price: 79900 },
+      transport: { name: "Transport/Security Credit", price: 49900 },
     };
 
     if (Array.isArray(addons)) {
