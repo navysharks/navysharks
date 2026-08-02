@@ -43,6 +43,42 @@ const ROUTES = [
     ]
   },
   {
+    id: "bkk-city",
+    country: "Thailand",
+    origin: "Bangkok (BKK)",
+    destination: "City Center Helipad",
+    price: 349,
+    time: "15m",
+    coordinates: [
+      [100.7501, 13.6900], // BKK
+      [100.5144, 13.7222]  // City
+    ]
+  },
+  {
+    id: "bkk-pattaya",
+    country: "Thailand",
+    origin: "Bangkok (BKK)",
+    destination: "Pattaya Helipad",
+    price: 899,
+    time: "35m",
+    coordinates: [
+      [100.7501, 13.6900], // BKK
+      [100.8710, 12.9236]  // Pattaya
+    ]
+  },
+  {
+    id: "utp-pattaya",
+    country: "Thailand",
+    origin: "Pattaya Airport (UTP)",
+    destination: "City Helipad",
+    price: 349,
+    time: "15m",
+    coordinates: [
+      [101.0064, 12.6780], // UTP
+      [100.8710, 12.9236]  // Pattaya City
+    ]
+  },
+  {
     id: "mnl-boracay",
     country: "Philippines",
     origin: "Manila (MNL)",
