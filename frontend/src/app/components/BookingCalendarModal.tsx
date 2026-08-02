@@ -4,7 +4,7 @@ import { X, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-r
 interface BookingCalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (date: Date) => void;
+  onConfirm: (startDate: Date, endDate: Date) => void;
   bundleName: string;
 }
 
@@ -15,12 +15,14 @@ export function BookingCalendarModal({
   bundleName,
 }: BookingCalendarModalProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   // W9: Reset date on reopen
   useEffect(() => {
     if (isOpen) {
-      setSelectedDate(null);
+      setStartDate(null);
+      setEndDate(null);
       setCurrentDate(new Date());
     }
   }, [isOpen]);
@@ -53,7 +55,18 @@ export function BookingCalendarModal({
   };
 
   const handleDateSelect = (day: number) => {
-    setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
+    const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    if (!startDate || (startDate && endDate)) {
+      setStartDate(selected);
+      setEndDate(null);
+    } else {
+      if (selected < startDate) {
+        setStartDate(selected);
+        setEndDate(null);
+      } else {
+        setEndDate(selected);
+      }
+    }
   };
 
   return (
@@ -117,13 +130,15 @@ export function BookingCalendarModal({
             ))}
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
-              const isSelected =
-                selectedDate?.getDate() === day &&
-                selectedDate?.getMonth() === currentDate.getMonth() &&
-                selectedDate?.getFullYear() === currentDate.getFullYear();
+              const currentItemDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+              
+              const isStartDate = startDate?.getTime() === currentItemDate.getTime();
+              const isEndDate = endDate?.getTime() === currentItemDate.getTime();
+              const isInRange = startDate && endDate && currentItemDate > startDate && currentItemDate < endDate;
+              const isSelected = isStartDate || isEndDate;
               
               // Mock some dates as unavailable (e.g., past dates or randomly)
-              const isPast = new Date(currentDate.getFullYear(), currentDate.getMonth(), day) < new Date(new Date().setHours(0,0,0,0));
+              const isPast = currentItemDate < new Date(new Date().setHours(0,0,0,0));
 
               return (
                 <button
@@ -135,6 +150,8 @@ export function BookingCalendarModal({
                       ? "text-slate-600 cursor-not-allowed"
                       : isSelected
                       ? "bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                      : isInRange
+                      ? "bg-cyan-500/20 text-cyan-400"
                       : "text-slate-300 hover:bg-slate-800 hover:text-cyan-400"
                   }`}
                 >
@@ -148,15 +165,15 @@ export function BookingCalendarModal({
         {/* Footer */}
         <div className="p-6 border-t border-slate-800 bg-slate-800/30">
           <button
-            disabled={!selectedDate}
-            onClick={() => selectedDate && onConfirm(selectedDate)}
+            disabled={!startDate || !endDate}
+            onClick={() => startDate && endDate && onConfirm(startDate, endDate)}
             className={`w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
-              selectedDate
+              startDate && endDate
                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:scale-[1.02]"
                 : "bg-slate-800 text-slate-500 cursor-not-allowed"
             }`}
           >
-            {selectedDate ? "Confirm Dates & Checkout" : "Select an arrival date"}
+            {startDate && endDate ? "Confirm Dates & Checkout" : "Select check-in and check-out dates"}
           </button>
           <p className="text-xs text-center text-slate-500 mt-4 flex items-center justify-center gap-1">
             <span className="w-2 h-2 rounded-full bg-cyan-500 inline-block"></span>

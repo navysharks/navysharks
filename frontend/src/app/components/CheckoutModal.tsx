@@ -13,7 +13,8 @@ interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (addons: string[], guestDetails: GuestDetails) => void;
-  selectedDate: Date | null;
+  startDate: Date | null;
+  endDate: Date | null;
   bundleName: string;
   bundlePrice: string;
   userToken: string | null;
@@ -24,7 +25,8 @@ export function CheckoutModal({
   isOpen,
   onClose,
   onComplete,
-  selectedDate,
+  startDate,
+  endDate,
   bundleName,
   bundlePrice,
   userToken,
@@ -118,7 +120,7 @@ export function CheckoutModal({
           <div>
             <h2 className="text-xl font-bold text-white">Complete Your Booking</h2>
             <p className="text-sm text-cyan-400 mt-1">
-              {bundleName} • {selectedDate?.toLocaleDateString()}
+              {bundleName} • {startDate?.toLocaleDateString()} to {endDate?.toLocaleDateString()}
             </p>
           </div>
           <button

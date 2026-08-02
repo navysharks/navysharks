@@ -15,6 +15,11 @@ import { toast } from "sonner";
 import { BookingCalendarModal } from "../components/BookingCalendarModal";
 import { AviationMap } from "../components/AviationMap";
 import { CheckoutModal } from "../components/CheckoutModal";
+import { AviationModal } from "../components/AviationModal";
+import { MarineModal } from "../components/MarineModal";
+import { ClubModal } from "../components/ClubModal";
+import { TransportModal } from "../components/TransportModal";
+import { AccommodationModal } from "../components/AccommodationModal";
 import { destinations } from "../data/membershipData";
 
 import { useAuth } from "../contexts/AuthContext";
@@ -34,7 +39,8 @@ export function Experiences() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [selectedBundleForCalendar, setSelectedBundleForCalendar] = useState("");
   const [selectedBundlePrice, setSelectedBundlePrice] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isAviationModalOpen, setIsAviationModalOpen] = useState(false);
   const [currency, setCurrency] = useState<"USD" | "EUR" | "AUD">("USD");
@@ -73,7 +79,8 @@ export function Experiences() {
           // Sync UI state (for display purposes)
           if (parsed.selectedBundleForCalendar) setSelectedBundleForCalendar(parsed.selectedBundleForCalendar);
           if (parsed.selectedBundlePrice) setSelectedBundlePrice(parsed.selectedBundlePrice);
-          if (parsed.selectedDate) setSelectedDate(new Date(parsed.selectedDate));
+          if (parsed.startDate) setStartDate(new Date(parsed.startDate));
+          if (parsed.endDate) setEndDate(new Date(parsed.endDate));
           if (parsed.selectedAddons) setSelectedAddons(parsed.selectedAddons);
           if (parsed.aviationStandardQty) setAviationStandardQty(parsed.aviationStandardQty);
           if (parsed.aviationFirstClassQty) setAviationFirstClassQty(parsed.aviationFirstClassQty);
@@ -89,8 +96,9 @@ export function Experiences() {
           // BUG FIX #4: Use parsed values DIRECTLY for the API call instead of
           // relying on React state (which is async and would be stale in a closure).
           const restoredBundleName = parsed.selectedBundleForCalendar || '';
-          const restoredBundlePrice = parsed.selectedBundlePrice || '';
-          const restoredDate = parsed.selectedDate ? new Date(parsed.selectedDate).toISOString() : new Date().toISOString();
+          // const restoredBundlePrice = parsed.selectedBundlePrice || '';
+          const restoredStartDate = parsed.startDate ? new Date(parsed.startDate).toISOString() : new Date().toISOString();
+          const restoredEndDate = parsed.endDate ? new Date(parsed.endDate).toISOString() : new Date().toISOString();
           const restoredAddons = parsed.selectedAddons || [];
           const restoredModalAddons: string[] = parsed.modalAddons || [];
           const restoredAviationStd = parsed.aviationStandardQty || 0;
@@ -142,7 +150,8 @@ export function Experiences() {
                 body: JSON.stringify({
                   userEmail: user.email,
                   bundleName: restoredBundleName,
-                  date: restoredDate,
+                  startDate: restoredStartDate,
+                  endDate: restoredEndDate,
                   addons: finalAddons,
                   verificationSessionId: sessionId,
                 }),
@@ -177,7 +186,8 @@ export function Experiences() {
     localStorage.setItem('pendingCheckoutState', JSON.stringify({
       selectedBundleForCalendar,
       selectedBundlePrice,
-      selectedDate: selectedDate?.toISOString(),
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
       selectedAddons,
       aviationStandardQty,
       aviationFirstClassQty,
@@ -258,8 +268,9 @@ export function Experiences() {
     setIsCalendarOpen(true);
   };
 
-  const handleCalendarConfirm = (date: Date) => {
-    setSelectedDate(date);
+  const handleCalendarConfirm = (start: Date, end: Date) => {
+    setStartDate(start);
+    setEndDate(end);
     setIsCalendarOpen(false);
     setIsCheckoutOpen(true);
   };
@@ -271,7 +282,7 @@ export function Experiences() {
       return;
     }
 
-    if (!selectedDate || !selectedBundleForCalendar) {
+    if (!startDate || !endDate || !selectedBundleForCalendar) {
       toast.error("Missing booking details.");
       return;
     }
@@ -321,7 +332,8 @@ export function Experiences() {
         body: JSON.stringify({
           userEmail: user.email,
           bundleName: selectedBundleForCalendar,
-          date: selectedDate ? selectedDate.toISOString() : new Date().toISOString(),
+          startDate: startDate ? startDate.toISOString() : new Date().toISOString(),
+          endDate: endDate ? endDate.toISOString() : new Date().toISOString(),
           addons: finalAddons,
           verificationSessionId: verificationSessionId,
           guestDetails: guestDetails || null,
@@ -1757,7 +1769,8 @@ export function Experiences() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         onComplete={handleCheckoutComplete}
-        selectedDate={selectedDate}
+        startDate={startDate}
+        endDate={endDate}
         bundleName={selectedBundleForCalendar}
         bundlePrice={selectedBundlePrice}
         userToken={userToken}
@@ -1767,354 +1780,75 @@ export function Experiences() {
       {/* Elite Membership Modal Removed */}
 
       {/* Aviation Modal */}
-      {isAviationModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
-              <h3 className="font-bold text-xl text-cyan-400">Aviation Credit</h3>
-              <button onClick={() => setIsAviationModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3">
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${aviationStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={aviationStandardQty > 0} onChange={() => setAviationStandardQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Standard Credit ($349*)</span>
-                  </div>
-                  {aviationStandardQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(Math.max(1, aviationStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{aviationStandardQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationStandardQty(aviationStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-                
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${aviationFirstClassQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={aviationFirstClassQty > 0} onChange={() => setAviationFirstClassQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">First Class Flyer ($999*)</span>
-                  </div>
-                  {aviationFirstClassQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(Math.max(1, aviationFirstClassQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{aviationFirstClassQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAviationFirstClassQty(aviationFirstClassQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-              </div>
+      <AviationModal
+        isOpen={isAviationModalOpen}
+        onClose={() => setIsAviationModalOpen(false)}
+        standardQty={aviationStandardQty}
+        firstClassQty={aviationFirstClassQty}
+        onSetStandardQty={setAviationStandardQty}
+        onSetFirstClassQty={setAviationFirstClassQty}
+        onAddToCart={() => {
+          if (!selectedAddons.includes('aviation')) {
+            setSelectedAddons(prev => [...prev, 'aviation']);
+          }
+        }}
+      />
 
-              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
-                All bought credit can be used for all aviation services
-              </p>
+      <MarineModal
+        isOpen={isMarineModalOpen}
+        onClose={() => setIsMarineModalOpen(false)}
+        standardQty={marineStandardQty}
+        upgradeQty={marineUpgradeQty}
+        onSetStandardQty={setMarineStandardQty}
+        onSetUpgradeQty={setMarineUpgradeQty}
+        onAddToCart={() => {
+          if (!selectedAddons.includes('marine')) {
+            setSelectedAddons(prev => [...prev, 'marine']);
+          }
+        }}
+      />
 
-              {(aviationStandardQty > 0 || aviationFirstClassQty > 0) && (
-                <div className="pt-4">
-                  <button 
-                    onClick={() => { 
-                      if (!selectedAddons.includes('aviation')) {
-                        setSelectedAddons([...selectedAddons, 'aviation']);
-                      }
-                      setIsAviationModalOpen(false);
-                      toast.success("Aviation Credit added to cart!", {
-                        description: `Total: $${((aviationStandardQty * 349) + (aviationFirstClassQty * 999)).toLocaleString()}`
-                      });
-                    }}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
-                  >
-                    <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${((aviationStandardQty * 349) + (aviationFirstClassQty * 999)).toLocaleString()}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <ClubModal
+        isOpen={isClubModalOpen}
+        onClose={() => setIsClubModalOpen(false)}
+        standardQty={clubStandardQty}
+        michelinQty={clubMichelinQty}
+        onSetStandardQty={setClubStandardQty}
+        onSetMichelinQty={setClubMichelinQty}
+        onAddToCart={() => {
+          if (!selectedAddons.includes('club')) {
+            setSelectedAddons(prev => [...prev, 'club']);
+          }
+        }}
+      />
 
-      {/* Marine Modal */}
-      {isMarineModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
-              <h3 className="font-bold text-xl text-cyan-400">Marine Credit</h3>
-              <button onClick={() => setIsMarineModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3">
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${marineStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={marineStandardQty > 0} onChange={() => setMarineStandardQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Standard Credit ($499*)</span>
-                  </div>
-                  {marineStandardQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineStandardQty(Math.max(1, marineStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{marineStandardQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineStandardQty(marineStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
+      <TransportModal
+        isOpen={isTransportModalOpen}
+        onClose={() => setIsTransportModalOpen(false)}
+        standardQty={transportStandardQty}
+        bulletProofQty={transportBulletProofQty}
+        onSetStandardQty={setTransportStandardQty}
+        onSetBulletProofQty={setTransportBulletProofQty}
+        onAddToCart={() => {
+          if (!selectedAddons.includes('transport')) {
+            setSelectedAddons(prev => [...prev, 'transport']);
+          }
+        }}
+      />
 
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${marineUpgradeQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={marineUpgradeQty > 0} onChange={() => setMarineUpgradeQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Marine Upgrade ($899*)</span>
-                  </div>
-                  {marineUpgradeQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineUpgradeQty(Math.max(1, marineUpgradeQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{marineUpgradeQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMarineUpgradeQty(marineUpgradeQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-              </div>
-
-              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
-                All bought credit can be used for all marine services
-              </p>
-
-              {(marineStandardQty > 0 || marineUpgradeQty > 0) && (
-                <div className="pt-4">
-                  <button 
-                    onClick={() => { 
-                      if (!selectedAddons.includes('marine')) {
-                        setSelectedAddons([...selectedAddons, 'marine']);
-                      }
-                      setIsMarineModalOpen(false);
-                      toast.success("Marine Credit added to cart!", {
-                        description: `Total: $${((marineStandardQty * 499) + (marineUpgradeQty * 899)).toLocaleString()}`
-                      });
-                    }}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
-                  >
-                    <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${((marineStandardQty * 499) + (marineUpgradeQty * 899)).toLocaleString()}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Club/Restaurant Modal */}
-      {isClubModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
-              <h3 className="font-bold text-xl text-cyan-400">Club/Restaurant Credit</h3>
-              <button onClick={() => setIsClubModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3">
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${clubStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={clubStandardQty > 0} onChange={() => setClubStandardQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Standard Credit ($499*)</span>
-                  </div>
-                  {clubStandardQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubStandardQty(Math.max(1, clubStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{clubStandardQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubStandardQty(clubStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${clubMichelinQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={clubMichelinQty > 0} onChange={() => setClubMichelinQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Michelin Hollywood ($899*)</span>
-                  </div>
-                  {clubMichelinQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubMichelinQty(Math.max(1, clubMichelinQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{clubMichelinQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClubMichelinQty(clubMichelinQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-              </div>
-
-              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
-                All bought credit can be used for all dining & nightlife services
-              </p>
-
-              {(clubStandardQty > 0 || clubMichelinQty > 0) && (
-                <div className="pt-4">
-                  <button 
-                    onClick={() => { 
-                      if (!selectedAddons.includes('club')) {
-                        setSelectedAddons([...selectedAddons, 'club']);
-                      }
-                      setIsClubModalOpen(false);
-                      toast.success("Club Credit added to cart!", {
-                        description: `Total: $${((clubStandardQty * 499) + (clubMichelinQty * 899)).toLocaleString()}`
-                      });
-                    }}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
-                  >
-                    <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${((clubStandardQty * 499) + (clubMichelinQty * 899)).toLocaleString()}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Transport Modal */}
-      {isTransportModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
-              <h3 className="font-bold text-xl text-cyan-400">Transport & Security</h3>
-              <button onClick={() => setIsTransportModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3">
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${transportStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={transportStandardQty > 0} onChange={() => setTransportStandardQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Standard Credit ($499*)</span>
-                  </div>
-                  {transportStandardQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTransportStandardQty(Math.max(1, transportStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{transportStandardQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTransportStandardQty(transportStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${transportBulletProofQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={transportBulletProofQty > 0} onChange={() => setTransportBulletProofQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Bullet-Proof President ($799*)</span>
-                  </div>
-                  {transportBulletProofQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTransportBulletProofQty(Math.max(1, transportBulletProofQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{transportBulletProofQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTransportBulletProofQty(transportBulletProofQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-              </div>
-
-              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
-                All bought credit can be used for all transport & security services
-              </p>
-
-              {(transportStandardQty > 0 || transportBulletProofQty > 0) && (
-                <div className="pt-4">
-                  <button 
-                    onClick={() => { 
-                      if (!selectedAddons.includes('transport')) {
-                        setSelectedAddons([...selectedAddons, 'transport']);
-                      }
-                      setIsTransportModalOpen(false);
-                      toast.success("Transport & Security added to cart!", {
-                        description: `Total: $${((transportStandardQty * 499) + (transportBulletProofQty * 799)).toLocaleString()}`
-                      });
-                    }}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
-                  >
-                    <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${((transportStandardQty * 499) + (transportBulletProofQty * 799)).toLocaleString()}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Accommodation Modal */}
-      {isAccommodationModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
-              <h3 className="font-bold text-xl text-cyan-400">Accommodation Credit</h3>
-              <button onClick={() => setIsAccommodationModalOpen(false)} className="text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 border border-slate-700 transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3">
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${accommodationStandardQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={accommodationStandardQty > 0} onChange={() => setAccommodationStandardQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">Standard Credit ($249*)</span>
-                  </div>
-                  {accommodationStandardQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationStandardQty(Math.max(1, accommodationStandardQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{accommodationStandardQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationStandardQty(accommodationStandardQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-
-                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${accommodationHighRollerQty > 0 ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_15px_rgba(34,211,238,0.15)]' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'}`}>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="accent-cyan-400 w-5 h-5" checked={accommodationHighRollerQty > 0} onChange={() => setAccommodationHighRollerQty(prev => prev > 0 ? 0 : 1)} />
-                    <span className="text-base font-semibold">High roller patron ($749*)</span>
-                  </div>
-                  {accommodationHighRollerQty > 0 && (
-                    <div className="flex items-center gap-3 bg-slate-900 rounded-lg border border-slate-600 p-1.5" onClick={e => e.preventDefault()}>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationHighRollerQty(Math.max(1, accommodationHighRollerQty - 1)); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">-</button>
-                      <span className="text-base w-6 text-center font-bold text-white">{accommodationHighRollerQty}</span>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccommodationHighRollerQty(accommodationHighRollerQty + 1); }} className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-md text-slate-300 transition-colors font-medium">+</button>
-                    </div>
-                  )}
-                </label>
-              </div>
-
-              <p className="text-sm text-cyan-300 bg-cyan-900/30 p-3 rounded-xl border border-cyan-500/30 text-center leading-relaxed font-medium">
-                All bought credit can be used for all accommodation services
-              </p>
-
-              {(accommodationStandardQty > 0 || accommodationHighRollerQty > 0) && (
-                <div className="pt-4">
-                  <button 
-                    onClick={() => { 
-                      if (!selectedAddons.includes('accommodation')) {
-                        setSelectedAddons([...selectedAddons, 'accommodation']);
-                      }
-                      setIsAccommodationModalOpen(false);
-                      toast.success("Accommodation Credit added to cart!", {
-                        description: `Total: $${((accommodationStandardQty * 249) + (accommodationHighRollerQty * 749)).toLocaleString()}`
-                      });
-                    }}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-between shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transform hover:-translate-y-1"
-                  >
-                    <span className="text-lg">Add to cart</span>
-                    <span className="text-lg">${((accommodationStandardQty * 249) + (accommodationHighRollerQty * 749)).toLocaleString()}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <AccommodationModal
+        isOpen={isAccommodationModalOpen}
+        onClose={() => setIsAccommodationModalOpen(false)}
+        standardQty={accommodationStandardQty}
+        highRollerQty={accommodationHighRollerQty}
+        onSetStandardQty={setAccommodationStandardQty}
+        onSetHighRollerQty={setAccommodationHighRollerQty}
+        onAddToCart={() => {
+          if (!selectedAddons.includes('accommodation')) {
+            setSelectedAddons(prev => [...prev, 'accommodation']);
+          }
+        }}
+      />
 
     </div>
   );

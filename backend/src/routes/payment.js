@@ -79,10 +79,17 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
   try {
     const userId = req.user.uid;
     const userEmail = req.user.email || req.body.userEmail;
-    const { bundleName, date, addons } = req.body;
+    const { bundleName, date, startDate, endDate, addons } = req.body;
 
-    if (!bundleName || !date) {
-      return res.status(400).json({ error: 'Missing required fields: bundleName, date' });
+    if (!bundleName || (!date && !startDate)) {
+      return res.status(400).json({ error: 'Missing required fields: bundleName, date(s)' });
+    }
+
+    let dateDisplay = '';
+    if (startDate && endDate) {
+      dateDisplay = `${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}`;
+    } else {
+      dateDisplay = new Date(date).toLocaleDateString();
     }
 
     // Server-side price validation — NEVER trust client-supplied prices
@@ -117,7 +124,7 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
           currency: 'usd',
           product_data: {
             name: bundleName,
-            description: `Experience Booking for ${new Date(date).toLocaleDateString()}`,
+            description: `Experience Booking for ${dateDisplay}`,
           },
           unit_amount: priceAmount,
         },

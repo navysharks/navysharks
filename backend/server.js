@@ -43,6 +43,7 @@ const paymentRoutes = require('./src/routes/payment');
 const webhookRoutes = require('./src/routes/webhook');
 const identityRoutes = require('./src/routes/identity');
 const contactRoutes = require('./src/routes/contact');
+const authRoutes = require('./src/routes/auth');
 
 // General rate limit: 100 requests per 15 minutes
 const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
@@ -55,18 +56,27 @@ const contactLimiter = rateLimit({
   message: { error: 'Too many messages sent. Please try again later.' }
 });
 
+// Strict limit for auth/email PINs: 5 per 15 minutes per IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many PIN requests. Please try again later.' }
+});
+
 // In Firebase, the function name "api" is stripped from the URL.
 // So /api/payment becomes /payment inside Express.
 app.use('/payment', paymentRoutes);
 app.use('/webhook', webhookRoutes);
 app.use('/identity', identityRoutes);
 app.use('/contact', contactLimiter, contactRoutes);
+app.use('/auth', authLimiter, authRoutes);
 
 // Also keep the /api prefix for local development without Firebase emulators
 app.use('/api/payment', paymentRoutes);
 app.use('/api/webhook', webhookRoutes);
 app.use('/api/identity', identityRoutes);
 app.use('/api/contact', contactLimiter, contactRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 
 // Export for Firebase Functions
 module.exports = app;
