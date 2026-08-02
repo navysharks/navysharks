@@ -10,12 +10,14 @@ interface EliteMembershipModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
+  plan?: 'yearly' | 'monthly';
 }
 
 export function EliteMembershipModal({
   isOpen,
   onClose,
   onComplete,
+  plan = 'yearly',
 }: EliteMembershipModalProps) {
   const [step, setStep] = useState<"details" | "verification">("details");
   const [verificationStatus, setVerificationStatus] = useState<"pending" | "scanning" | "success">("pending");
@@ -104,7 +106,7 @@ export function EliteMembershipModal({
           <div>
             <h2 className="text-xl font-bold text-yellow-500">Elite Membership Registration</h2>
             <p className="text-sm text-slate-400 mt-1">
-              $245/year • Complete your profile to proceed
+              {plan === 'monthly' ? '$49/month' : '$245/year'} • Complete your profile to proceed
             </p>
           </div>
           <button

@@ -471,6 +471,7 @@ export function Membership() {
         isOpen={isEliteModalOpen}
         onClose={() => setIsEliteModalOpen(false)}
         onComplete={handleEliteCheckoutComplete}
+        plan={eliteBilling}
       />
     </div>
   );
