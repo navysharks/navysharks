@@ -409,11 +409,11 @@ export function Experiences() {
                   </p>
                 </div>
       
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 max-w-7xl mx-auto mb-8 items-start">
-                  <div className="relative group">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 max-w-7xl mx-auto mb-8 items-stretch">
+                  <div className="relative group h-full">
                     <div 
                       onClick={() => handleAddonClick('elite')}
-                      className={`bg-slate-800 p-6 rounded-xl border text-center relative overflow-hidden group cursor-pointer transition-all ${
+                      className={`bg-slate-800 p-6 rounded-xl border text-center h-full flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all ${
                         selectedAddons.includes('elite') ? 'border-amber-400 bg-slate-800/80 ring-2 ring-amber-400/50' : 'border-amber-500/50 hover:border-amber-400'
                       }`}
                     >
@@ -437,7 +437,7 @@ export function Experiences() {
       
                   <div 
                     onClick={() => handleAddonClick('marine')}
-                    className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                    className={`bg-slate-800 p-6 rounded-xl border text-center h-full flex flex-col justify-between cursor-pointer transition-all ${
                       selectedAddons.includes('marine') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
                     }`}
                   >
@@ -454,7 +454,7 @@ export function Experiences() {
       
                   <div 
                     onClick={() => handleAddonClick('aviation')}
-                    className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                    className={`bg-slate-800 p-6 rounded-xl border text-center h-full flex flex-col justify-between cursor-pointer transition-all ${
                       selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
                     }`}
                   >
@@ -472,7 +472,7 @@ export function Experiences() {
       
                   <div 
                     onClick={() => handleAddonClick('accommodation')}
-                    className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                    className={`bg-slate-800 p-6 rounded-xl border text-center h-full flex flex-col justify-between cursor-pointer transition-all ${
                       selectedAddons.includes('accommodation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
                     }`}
                   >
@@ -489,7 +489,7 @@ export function Experiences() {
       
                   <div 
                     onClick={() => handleAddonClick('club')}
-                  className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                  className={`bg-slate-800 p-6 rounded-xl border text-center h-full flex flex-col justify-between cursor-pointer transition-all ${
                     selectedAddons.includes('club') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
                   }`}
                 >
@@ -506,7 +506,7 @@ export function Experiences() {
       
                 <div 
                   onClick={() => handleAddonClick('transport')}
-                  className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                  className={`bg-slate-800 p-6 rounded-xl border text-center h-full flex flex-col justify-between cursor-pointer transition-all ${
                     selectedAddons.includes('transport') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
                   }`}
                 >
@@ -624,7 +624,7 @@ export function Experiences() {
                   ).map((bundle: any, index: number) => (
                     <div
                       key={index}
-                      className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                      className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                         bundle.popular
                           ? "border-cyan-500"
                           : "border-slate-700"
@@ -689,7 +689,7 @@ export function Experiences() {
 
                       <button
                         onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                        className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                        className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                             : "bg-slate-700 text-white hover:bg-slate-600"
@@ -750,7 +750,7 @@ export function Experiences() {
                     {currentDestination.boracayBundles?.map((bundle: any, index: number) => (
                       <div
                         key={`boracay-${index}`}
-                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                           bundle.popular ? "border-cyan-500" : "border-slate-700"
                         }`}
                       >
@@ -801,7 +801,7 @@ export function Experiences() {
                         </div>
                         <button 
                           onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                          className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                          className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                             : "bg-slate-700 text-white hover:bg-slate-600"
@@ -829,7 +829,7 @@ export function Experiences() {
                     {currentDestination.siargaoBundles?.map((bundle: any, index: number) => (
                       <div
                         key={`siargao-${index}`}
-                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                           bundle.popular ? "border-cyan-500" : "border-slate-700"
                         }`}
                       >
@@ -880,7 +880,7 @@ export function Experiences() {
                         </div>
                         <button 
                           onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                          className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                          className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                             : "bg-slate-700 text-white hover:bg-slate-600"
@@ -908,7 +908,7 @@ export function Experiences() {
                     {currentDestination.palawanBundles?.map((bundle: any, index: number) => (
                       <div
                         key={`palawan-${index}`}
-                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                        className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                           bundle.popular ? "border-cyan-500" : "border-slate-700"
                         }`}
                       >
@@ -959,7 +959,7 @@ export function Experiences() {
                         </div>
                         <button 
                           onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                          className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                          className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                             : "bg-slate-700 text-white hover:bg-slate-600"
@@ -999,7 +999,7 @@ export function Experiences() {
                   (bundle: any, index: number) => (
                     <div
                       key={`phuket-${index}`}
-                      className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                      className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                         bundle.popular
                           ? "border-cyan-500"
                           : "border-slate-700"
@@ -1064,7 +1064,7 @@ export function Experiences() {
 
                       <button
                         onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                        className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                        className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                           bundle.popular
                             ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                             : "bg-slate-700 text-white hover:bg-slate-600"
@@ -1092,7 +1092,7 @@ export function Experiences() {
                       (bundle: any, index: number) => (
                         <div
                           key={`bangkok-${index}`}
-                          className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                          className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                             bundle.popular
                               ? "border-cyan-500"
                               : "border-slate-700"
@@ -1158,7 +1158,7 @@ export function Experiences() {
 
                           <button
                             onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                            className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                            className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                               bundle.popular
                                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                                 : "bg-slate-700 text-white hover:bg-slate-600"
@@ -1211,7 +1211,7 @@ export function Experiences() {
                       (bundle: any, index: number) => (
                         <div
                           key={`pattaya-${index}`}
-                          className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] ${
+                          className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-2xl border-2 relative overflow-hidden min-h-[320px] flex flex-col ${
                             bundle.popular
                               ? "border-cyan-500"
                               : "border-slate-700"
@@ -1277,7 +1277,7 @@ export function Experiences() {
 
                           <button
                             onClick={() => handleOpenCalendar(bundle.name, bundle.price)}
-                            className={`w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
+                            className={`mt-auto w-full py-3 md:py-4 font-semibold text-sm md:text-base rounded-xl transition-all ${
                               bundle.popular
                                 ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700"
                                 : "bg-slate-700 text-white hover:bg-slate-600"
