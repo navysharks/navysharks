@@ -117,6 +117,12 @@ export function EliteMembershipModal({
           </button>
         </div>
 
+        {/* Voucher Notification */}
+        <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-6 py-3 text-sm text-yellow-500/90 flex items-start gap-2">
+          <span className="mt-0.5">ℹ️</span>
+          <span><strong>Note:</strong> The $49 Welcome Vouchers are valid on purchases of $500 or more. Limit 1 use per 24 hours.</span>
+        </div>
+
         <div className="flex flex-col md:flex-row">
           {/* Progress Sidebar */}
           <div className="md:w-1/3 bg-slate-800/30 p-6 border-r border-slate-800 flex flex-row md:flex-col gap-4 md:gap-0 justify-between md:justify-start">
