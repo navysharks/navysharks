@@ -379,24 +379,14 @@ export function Dashboard() {
                 </div>
                 
                 <button
-                  onClick={async () => {
+                  onClick={() => {
                     if (!user) return;
-                    try {
-                      const userDocRef = doc(db, "users", user.uid);
-                      const userDoc = await getDoc(userDocRef);
-                      const existingPromo = userDoc.data()?.promoCode;
-                      if (existingPromo) {
-                        setPromoCode(existingPromo);
-                      } else {
-                        const prefix = userData?.name ? userData.name.substring(0, 3).toUpperCase() : 'VIP';
-                        const newCode = `${prefix}-${crypto.randomUUID().substring(0, 4).toUpperCase()}`;
-                        await setDoc(userDocRef, { promoCode: newCode }, { merge: true });
-                        setPromoCode(newCode);
-                      }
-                    } catch (err) {
-                      console.error("Error generating promo code:", err);
+                    if (userData?.upgradeTokens && userData.upgradeTokens.length > 0) {
+                      setPromoCode(userData.upgradeTokens[0]);
+                      setShowClaimModal(true);
+                    } else {
+                      toast('No upgrade tokens available yet');
                     }
-                    setShowClaimModal(true);
                   }}
                   disabled={tripCredits === 0}
                   className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${

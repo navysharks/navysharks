@@ -38,6 +38,11 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
       const userId = session.client_reference_id;
 
       if (userId) {
+        // Verify payment was actually received (handles delayed payment methods)
+        if (session.payment_status !== 'paid') {
+          console.log(`Payment not yet received for session ${session.id}. Status: ${session.payment_status}. Skipping.`);
+          break;
+        }
         try {
           if (session.metadata && session.metadata.type === 'bundle') {
             // Save bundle booking to subcollection

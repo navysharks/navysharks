@@ -25,8 +25,8 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
 
     // Pricing: yearly = $245.00, monthly = $49.00
     const priceMap = {
-      yearly: { amount: 24500, label: 'Yearly ($245/year)' },
-      monthly: { amount: 4900, label: 'Monthly ($49/month)' },
+      yearly: { amount: 24500, label: 'Yearly ($245/year)', interval: 'year' },
+      monthly: { amount: 4900, label: 'Monthly ($49/month)', interval: 'month' },
     };
     const selectedPrice = priceMap[plan];
 
@@ -52,11 +52,14 @@ router.post('/create-checkout-session', verifyToken, async (req, res) => {
               description: `${selectedPrice.label} — Exclusive access to premium concierge services, vetted safe zones, and curated lifestyle experiences.`,
             },
             unit_amount: selectedPrice.amount,
+            recurring: {
+              interval: plan === 'monthly' ? 'month' : 'year',
+            },
           },
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      mode: 'subscription',
       // Use the verified UID from the token, not from the body
       client_reference_id: userId,
       customer_email: userEmail,
@@ -177,10 +180,12 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
         date: date,
         // W14: Minify addons to fit strictly under Stripe's 500-char metadata limit
         addons: addons ? JSON.stringify(
-          addons.map(a => ({ 
-            id: typeof a === 'string' ? a : a.id, 
-            quantity: typeof a === 'string' ? 1 : a.quantity || 1 
-          }))
+          addons
+            .map(a => ({ 
+              id: typeof a === 'string' ? a : a.id, 
+              quantity: typeof a === 'string' ? 1 : a.quantity || 1 
+            }))
+            .filter(a => addonsMap[a.id])
         ) : "[]",
       },
       success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/success?session_id={CHECKOUT_SESSION_ID}&type=bundle`,

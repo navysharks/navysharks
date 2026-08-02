@@ -13,7 +13,15 @@ service cloud.firestore {
 
       // A user can CREATE their own document (on first login)
       allow create: if request.auth != null
-        && request.auth.uid == userId;
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+          'displayName',
+          'email',
+          'photoURL',
+          'createdAt',
+          'applicationData',
+          'applicationSubmittedAt'
+        ]);
 
       // A user can UPDATE their own document BUT cannot touch
       // sensitive fields that are only set by the backend (Admin SDK).
@@ -26,7 +34,12 @@ service cloud.firestore {
           'membershipPurchaseDate',
           'stripeSessionId',
           'stripeCustomerId',
-          'role'
+          'role',
+          'upgradeTokens',
+          'promoCode',
+          'rfidCode',
+          'billingPlan',
+          'amountPaid'
         ]);
 
       // No client-side deletes allowed
