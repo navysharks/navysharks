@@ -1361,7 +1361,7 @@ export function Experiences() {
                     { name: "Half Day", price: 399 },
                     { name: "Full Day", price: 649 },
                     {
-                      name: "Premium Yacht Experience",
+                      name: "Premium Upsized Yacht Experience",
                       price: 999,
                     },
                   ].map((option) => (
