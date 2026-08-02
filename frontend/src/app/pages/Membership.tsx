@@ -198,7 +198,7 @@ export function Membership() {
                       </p>
                       <p className="text-xs text-slate-300">
                         Added to your account instantly upon purchase. 
-                        <span className="font-semibold text-white ml-1">Limit 1 voucher use per 24 hours.</span>
+                        <span className="font-semibold text-white ml-1">Valid on purchases of $500 or more. Limit 1 voucher use per 24 hours.</span>
                       </p>
                     </div>
 

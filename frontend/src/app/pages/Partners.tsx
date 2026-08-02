@@ -1,4 +1,4 @@
-import { Hotel, Utensils, Music, Anchor, Lock, Unlock, Crown } from "lucide-react";
+import { Hotel, Utensils, Music, Lock, Unlock, Crown } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
@@ -16,36 +16,6 @@ export function Partners() {
   ];
 
   const partners = {
-    marine: [
-      {
-        name: "Caribbean Yacht Charters",
-        location: "Cartagena, Colombia",
-        image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1080",
-        country: "Colombia",
-        discount: "Exclusive member access",
-      },
-      {
-        name: "Rio Jet Ski Adventures",
-        location: "Copacabana, Rio",
-        image: "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1080",
-        country: "Brazil",
-        discount: "Curated marine allocation",
-      },
-      {
-        name: "Manila Bay Yacht Club",
-        location: "Manila, Philippines",
-        image: "https://images.unsplash.com/photo-1574041160351-46ab3469e38e?auto=format&fit=crop&q=80&w=1080",
-        country: "Philippines",
-        discount: "Exclusive sunset allocation",
-      },
-      {
-        name: "Phuket Luxury Charters",
-        location: "Phuket, Thailand",
-        image: "https://images.unsplash.com/photo-1510006851064-e6056cd0e3a8?auto=format&fit=crop&q=80&w=1080",
-        country: "Thailand",
-        discount: "Curated captain allocation",
-      },
-    ],
     nightclubs: [
       {
         name: "Envy Rooftop Lounge",

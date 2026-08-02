@@ -26,12 +26,10 @@ export function Dashboard() {
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   // Pre-compute barcode dimensions once so they don't flicker on re-renders
-  const barcodeBars = useMemo(() =>
-    [...Array(24)].map(() => ({
-      width: Math.random() > 0.5 ? 'w-1' : 'w-2',
-      height: Math.random() > 0.5 ? 'h-full' : 'h-3/4',
-    })),
-  []);
+  const barcodeBars = Array.from({ length: 30 }, (_, i) => ({
+    width: ((i * 7 + 3) % 5) + 1,
+    opacity: ((i * 13 + 5) % 3 === 0) ? 0.3 : ((i * 13 + 5) % 3 === 1) ? 0.6 : 1,
+  }));
 
   const handleShowRFID = async () => {
     if (!user) return;
@@ -705,7 +703,7 @@ export function Dashboard() {
                   {/* Fake Barcode Lines */}
                   <div className="flex gap-1 h-20 mb-6 items-center w-full justify-center px-4">
                     {barcodeBars.map((bar, i) => (
-                      <div key={i} className={`bg-white rounded-full ${bar.width} ${bar.height}`} />
+                      <div key={i} className={`bg-white rounded-full h-full w-${bar.width}`} style={{ opacity: bar.opacity }} />
                     ))}
                   </div>
                   <div className="text-3xl font-mono font-bold tracking-[0.25em] text-white drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">

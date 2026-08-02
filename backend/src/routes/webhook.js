@@ -177,6 +177,12 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
       break;
     }
       
+    case 'identity.verification_session.verified': {
+      const verificationSession = event.data.object;
+      console.log(`Identity verification completed for session: ${verificationSession.id}`);
+      break;
+    }
+      
     // Handle other event types if necessary
     default:
       // Unhandled event type — ignored
