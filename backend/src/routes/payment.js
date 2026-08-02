@@ -79,10 +79,10 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
   try {
     const userId = req.user.uid;
     const userEmail = req.user.email || req.body.userEmail;
-    const { bundleName, price, date, addons } = req.body;
+    const { bundleName, date, addons } = req.body;
 
-    if (!bundleName || !price || !date) {
-      return res.status(400).json({ error: 'Missing required fields: bundleName, price, date' });
+    if (!bundleName || !date) {
+      return res.status(400).json({ error: 'Missing required fields: bundleName, date' });
     }
 
     // Server-side price validation — NEVER trust client-supplied prices
@@ -200,5 +200,30 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
 });
 
 
+
+router.post('/create-portal-session', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    
+    // Get the user's Stripe customer ID from Firestore
+    const { db } = require('../firebase');
+    const userDoc = await db.collection('users').doc(userId).get();
+    const stripeCustomerId = userDoc.data()?.stripeCustomerId;
+    
+    if (!stripeCustomerId) {
+      return res.status(400).json({ error: 'No Stripe customer found. Please purchase a membership first.' });
+    }
+
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: stripeCustomerId,
+      return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/membership`,
+    });
+
+    res.json({ url: portalSession.url });
+  } catch (error) {
+    console.error('Error creating portal session:', error);
+    res.status(500).json({ error: 'Failed to create customer portal session.' });
+  }
+});
 
 module.exports = router;

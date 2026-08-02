@@ -142,7 +142,6 @@ export function Experiences() {
                 body: JSON.stringify({
                   userEmail: user.email,
                   bundleName: restoredBundleName,
-                  price: restoredBundlePrice,
                   date: restoredDate,
                   addons: finalAddons,
                   verificationSessionId: sessionId,
@@ -322,7 +321,6 @@ export function Experiences() {
         body: JSON.stringify({
           userEmail: user.email,
           bundleName: selectedBundleForCalendar,
-          price: selectedBundlePrice,
           date: selectedDate ? selectedDate.toISOString() : new Date().toISOString(),
           addons: finalAddons,
           verificationSessionId: verificationSessionId,
