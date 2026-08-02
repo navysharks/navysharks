@@ -1076,7 +1076,9 @@ export function Experiences() {
                   ),
                 )}
 
-                {upgradeOptionsSection}
+                <div className="col-span-full w-screen relative left-1/2 -translate-x-1/2 my-12">
+                  {upgradeOptionsSection}
+                </div>
 
                 {/* Bangkok Packages - Coming Soon */}
                 <div className="col-span-full mb-4 md:mb-8 mt-8 md:mt-12">
