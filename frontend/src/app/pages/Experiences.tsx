@@ -1076,6 +1076,8 @@ export function Experiences() {
                   ),
                 )}
 
+                {upgradeOptionsSection}
+
                 {/* Bangkok Packages - Coming Soon */}
                 <div className="col-span-full mb-4 md:mb-8 mt-8 md:mt-12">
                   <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 mb-4 md:mb-6">
@@ -1194,8 +1196,6 @@ export function Experiences() {
                     </div>
                   </div>
                 </div>
-
-                {upgradeOptionsSection}
 
                 {/* Pattaya Packages - Coming Soon */}
                 <div className="col-span-full mb-4 md:mb-8 mt-8 md:mt-12">
