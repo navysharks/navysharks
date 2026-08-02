@@ -394,6 +394,146 @@ export function Experiences() {
 
 
 
+  const upgradeOptionsSection = (
+    <>
+      {/* Upgrade Options */}
+            <section className="py-20 bg-slate-900">
+              <div className="container mx-auto px-4">
+                <div className="max-w-4xl mx-auto text-center mb-12">
+                  <h2 className="text-4xl font-bold mb-4 text-cyan-400">
+                    Enhance Your Experience
+                  </h2>
+                  <p className="text-lg text-slate-300">
+                    Add premium upgrades at checkout for an
+                    unforgettable trip
+                  </p>
+                </div>
+      
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 max-w-7xl mx-auto mb-8 items-start">
+                  <div className="relative group">
+                    <div 
+                      onClick={() => handleAddonClick('elite')}
+                      className={`bg-slate-800 p-6 rounded-xl border text-center relative overflow-hidden group cursor-pointer transition-all ${
+                        selectedAddons.includes('elite') ? 'border-amber-400 bg-slate-800/80 ring-2 ring-amber-400/50' : 'border-amber-500/50 hover:border-amber-400'
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="text-2xl font-bold text-amber-400 mb-2 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+                        FREE
+                      </div>
+                      <h3 className="font-semibold text-amber-50 mb-2">
+                        Elite Concierge Chat
+                      </h3>
+                      <p className="text-sm text-amber-200/70">
+                        24/7 dedicated chat for 24 hours
+                      </p>
+                    </div>
+                    {showEliteMessage && (
+                      <div className="absolute top-full mt-2 left-0 right-0 bg-red-900/90 text-red-100 text-xs p-2 rounded border border-red-500/50 text-center z-20 shadow-lg animate-in fade-in slide-in-from-top-2">
+                        Please select at least one credit first to unlock your FREE 24-hour Elite Concierge Chat.
+                      </div>
+                    )}
+                  </div>
+      
+                  <div 
+                    onClick={() => handleAddonClick('marine')}
+                    className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                      selectedAddons.includes('marine') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+                    }`}
+                  >
+                    <div className="text-2xl font-bold text-cyan-400 mb-2">
+                      +$499
+                    </div>
+                    <h3 className="font-semibold mb-2">
+                      Marine Credit
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Yacht + Jetski
+                    </p>
+                  </div>
+      
+                  <div 
+                    onClick={() => handleAddonClick('aviation')}
+                    className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                      selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+                    }`}
+                  >
+                    <div className="text-2xl font-bold text-cyan-400 mb-2">
+                      +$349
+                    </div>
+                    <h3 className="font-semibold mb-2">
+                      Aviation Credit
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Helicopters + jets <br />
+                      Helicopter transfers starting from 349*
+                    </p>
+                  </div>
+      
+                  <div 
+                    onClick={() => handleAddonClick('accommodation')}
+                    className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                      selectedAddons.includes('accommodation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+                    }`}
+                  >
+                    <div className="text-2xl font-bold text-cyan-400 mb-2">
+                      +$249
+                    </div>
+                    <h3 className="font-semibold mb-2">
+                      Accommodation Credit
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Premium stays & upgrades
+                    </p>
+                  </div>
+      
+                  <div 
+                    onClick={() => handleAddonClick('club')}
+                  className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                    selectedAddons.includes('club') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+                  }`}
+                >
+                  <div className="text-2xl font-bold text-cyan-400 mb-2">
+                    +$499
+                  </div>
+                  <h3 className="font-semibold mb-2">
+                    Club/Restaurant Credit
+                  </h3>
+                  <p className="text-sm text-slate-400">
+                    Dining, nightlife
+                  </p>
+                </div>
+      
+                <div 
+                  onClick={() => handleAddonClick('transport')}
+                  className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
+                    selectedAddons.includes('transport') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
+                  }`}
+                >
+                  <div className="text-2xl font-bold text-cyan-400 mb-2">
+                    +$499
+                  </div>
+                  <h3 className="font-semibold mb-2">
+                    Transport/Security
+                  </h3>
+                  <p className="text-sm text-slate-400">
+                    Private transfers, car hire, chauffeur services, personal body guards
+                  </p>
+                </div>
+                </div>
+                
+                <div className="text-center mt-8">
+                  <button 
+                    onClick={() => handleOpenCalendar("Custom Quote / Enhanced Experience", "")}
+                    className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-slate-900 font-bold rounded-full hover:from-yellow-400 hover:to-yellow-500 transition-all text-lg shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]">
+                    Request a Custom Quote
+                  </button>
+                </div>
+              </div>
+            </section>
+    </>
+  );
+
   return (
     <div className="bg-slate-950 text-white min-h-screen">
       {/* Hero */}
@@ -1055,6 +1195,8 @@ export function Experiences() {
                   </div>
                 </div>
 
+                {upgradeOptionsSection}
+
                 {/* Pattaya Packages - Coming Soon */}
                 <div className="col-span-full mb-4 md:mb-8 mt-8 md:mt-12">
                   <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 mb-4 md:mb-6">
@@ -1598,141 +1740,7 @@ export function Experiences() {
         </div>
       )}
 
-      {/* Upgrade Options */}
-      <section className="py-20 bg-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-cyan-400">
-              Enhance Your Experience
-            </h2>
-            <p className="text-lg text-slate-300">
-              Add premium upgrades at checkout for an
-              unforgettable trip
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 max-w-7xl mx-auto mb-8 items-start">
-            <div className="relative group">
-              <div 
-                onClick={() => handleAddonClick('elite')}
-                className={`bg-slate-800 p-6 rounded-xl border text-center relative overflow-hidden group cursor-pointer transition-all ${
-                  selectedAddons.includes('elite') ? 'border-amber-400 bg-slate-800/80 ring-2 ring-amber-400/50' : 'border-amber-500/50 hover:border-amber-400'
-                }`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="text-2xl font-bold text-amber-400 mb-2 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
-                  FREE
-                </div>
-                <h3 className="font-semibold text-amber-50 mb-2">
-                  Elite Concierge Chat
-                </h3>
-                <p className="text-sm text-amber-200/70">
-                  24/7 dedicated chat for 24 hours
-                </p>
-              </div>
-              {showEliteMessage && (
-                <div className="absolute top-full mt-2 left-0 right-0 bg-red-900/90 text-red-100 text-xs p-2 rounded border border-red-500/50 text-center z-20 shadow-lg animate-in fade-in slide-in-from-top-2">
-                  Please select at least one credit first to unlock your FREE 24-hour Elite Concierge Chat.
-                </div>
-              )}
-            </div>
-
-            <div 
-              onClick={() => handleAddonClick('marine')}
-              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
-                selectedAddons.includes('marine') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
-              }`}
-            >
-              <div className="text-2xl font-bold text-cyan-400 mb-2">
-                +$499
-              </div>
-              <h3 className="font-semibold mb-2">
-                Marine Credit
-              </h3>
-              <p className="text-sm text-slate-400">
-                Yacht + Jetski
-              </p>
-            </div>
-
-            <div 
-              onClick={() => handleAddonClick('aviation')}
-              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
-                selectedAddons.includes('aviation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
-              }`}
-            >
-              <div className="text-2xl font-bold text-cyan-400 mb-2">
-                +$349
-              </div>
-              <h3 className="font-semibold mb-2">
-                Aviation Credit
-              </h3>
-              <p className="text-sm text-slate-400">
-                Helicopters + jets <br />
-                Helicopter transfers starting from 349*
-              </p>
-            </div>
-
-            <div 
-              onClick={() => handleAddonClick('accommodation')}
-              className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
-                selectedAddons.includes('accommodation') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
-              }`}
-            >
-              <div className="text-2xl font-bold text-cyan-400 mb-2">
-                +$249
-              </div>
-              <h3 className="font-semibold mb-2">
-                Accommodation Credit
-              </h3>
-              <p className="text-sm text-slate-400">
-                Premium stays & upgrades
-              </p>
-            </div>
-
-            <div 
-              onClick={() => handleAddonClick('club')}
-            className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
-              selectedAddons.includes('club') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
-            }`}
-          >
-            <div className="text-2xl font-bold text-cyan-400 mb-2">
-              +$499
-            </div>
-            <h3 className="font-semibold mb-2">
-              Club/Restaurant Credit
-            </h3>
-            <p className="text-sm text-slate-400">
-              Dining, nightlife
-            </p>
-          </div>
-
-          <div 
-            onClick={() => handleAddonClick('transport')}
-            className={`bg-slate-800 p-6 rounded-xl border text-center cursor-pointer transition-all ${
-              selectedAddons.includes('transport') ? 'border-cyan-400 bg-slate-700/80 ring-2 ring-cyan-400/50' : 'border-slate-700 hover:border-slate-500'
-            }`}
-          >
-            <div className="text-2xl font-bold text-cyan-400 mb-2">
-              +$499
-            </div>
-            <h3 className="font-semibold mb-2">
-              Transport/Security
-            </h3>
-            <p className="text-sm text-slate-400">
-              Private transfers, car hire, chauffeur services, personal body guards
-            </p>
-          </div>
-          </div>
-          
-          <div className="text-center mt-8">
-            <button 
-              onClick={() => handleOpenCalendar("Custom Quote / Enhanced Experience", "")}
-              className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-slate-900 font-bold rounded-full hover:from-yellow-400 hover:to-yellow-500 transition-all text-lg shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]">
-              Request a Custom Quote
-            </button>
-          </div>
-        </div>
-      </section>
+      {currentDestination.name !== "Thailand" && upgradeOptionsSection}
 
       {/* End of Experiences Section */}
 
