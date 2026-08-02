@@ -6,11 +6,10 @@ import { useAuth } from "../contexts/AuthContext";
 export function Partners() {
   const { userData } = useAuth();
   const isElite = userData?.membershipStatus === "Elite";
-  const [activeCategory, setActiveCategory] = useState("marine");
+  const [activeCategory, setActiveCategory] = useState("nightclubs");
   const [selectedCountry, setSelectedCountry] = useState("all");
 
   const categories = [
-    { id: "marine", label: "Marine", icon: Anchor },
     { id: "nightclubs", label: "VIP Nightlife", icon: Music },
     { id: "hotels", label: "Accommodation", icon: Hotel },
     { id: "restaurants", label: "Dining", icon: Utensils },
