@@ -87,7 +87,15 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       });
     }
 
-    const verificationSession = await stripe.identity.verificationSessions.retrieve(verificationSessionId);
+    let verificationSession;
+    try {
+      verificationSession = await stripe.identity.verificationSessions.retrieve(verificationSessionId);
+    } catch (err) {
+      console.error("Stripe Identity Retrieve Error:", err);
+      return res.status(400).json({ 
+        error: "Verification session invalid or expired. Please restart the verification process." 
+      });
+    }
 
     if (verificationSession.status !== 'verified') {
       let niceError = "Identity verification was not completed successfully.";

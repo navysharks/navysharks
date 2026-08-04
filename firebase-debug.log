@@ -1,0 +1,22 @@
+[debug] [2026-08-04T16:54:03.936Z] ----------------------------------------------------------------------
+[debug] [2026-08-04T16:54:03.938Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Alfie Lynard\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2026-08-04T16:54:03.939Z] CLI Version:   15.13.0
+[debug] [2026-08-04T16:54:03.939Z] Platform:      win32
+[debug] [2026-08-04T16:54:03.939Z] Node Version:  v25.8.0
+[debug] [2026-08-04T16:54:03.939Z] Time:          Wed Aug 05 2026 00:54:03 GMT+0800 (Philippine Standard Time)
+[debug] [2026-08-04T16:54:03.939Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-04T16:54:06.341Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-04T16:54:06.342Z] > authorizing via signed-in user (adminnavysharks@gmail.com)
+[debug] [2026-08-04T16:54:06.342Z] [iam] checking project navysharks for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2026-08-04T16:54:06.343Z] Checked if tokens are valid: true, expires at: 1785865445497
+[debug] [2026-08-04T16:54:06.344Z] Checked if tokens are valid: true, expires at: 1785865445497
+[debug] [2026-08-04T16:54:06.345Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/navysharks:testIamPermissions [none]
+[debug] [2026-08-04T16:54:06.345Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/navysharks:testIamPermissions  x-goog-user-project=navysharks
+[debug] [2026-08-04T16:54:06.345Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/navysharks:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-08-04T16:54:07.331Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/navysharks:testIamPermissions 200
+[debug] [2026-08-04T16:54:07.331Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/navysharks:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-08-04T16:54:07.331Z] Checked if tokens are valid: true, expires at: 1785865445497
+[debug] [2026-08-04T16:54:07.331Z] Checked if tokens are valid: true, expires at: 1785865445497
+[debug] [2026-08-04T16:54:07.331Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/navysharks/serviceAccounts/navysharks@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-08-04T16:54:07.331Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/navysharks/serviceAccounts/navysharks@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}

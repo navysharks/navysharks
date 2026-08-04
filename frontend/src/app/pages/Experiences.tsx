@@ -164,7 +164,7 @@ export function Experiences() {
                 throw new Error(data.error || "Failed to create checkout session");
               }
             } catch (error: any) {
-              const isVerificationError = error.message.includes("Verification");
+              const isVerificationError = error.message.toLowerCase().includes("verification");
               toast.error(isVerificationError ? "Identity Verification Failed" : "Checkout failed", { 
                 id: "bundle-checkout", 
                 description: error.message 
