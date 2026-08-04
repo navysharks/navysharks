@@ -312,7 +312,9 @@ export function CheckoutModal({
                       </div>
                       <div className="ml-auto">
                         {verificationStatus === 'pending' && (
-                          <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">
+                          <button 
+                            onClick={handleStartVerification}
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">
                             <Upload className="w-4 h-4" /> Upload
                           </button>
                         )}
