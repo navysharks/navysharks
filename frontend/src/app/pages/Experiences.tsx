@@ -164,7 +164,12 @@ export function Experiences() {
                 throw new Error(data.error || "Failed to create checkout session");
               }
             } catch (error: any) {
-              toast.error("Checkout failed", { id: "bundle-checkout", description: error.message });
+              const isVerificationError = error.message.includes("Verification");
+              toast.error(isVerificationError ? "Identity Verification Failed" : "Checkout failed", { 
+                id: "bundle-checkout", 
+                description: error.message 
+              });
+              setIsCheckoutOpen(true); // Re-open the modal so they can try again
             }
           })();
 

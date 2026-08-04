@@ -79,7 +79,25 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
   try {
     const userId = req.user.uid;
     const userEmail = req.user.email || req.body.userEmail;
-    const { bundleName, date, startDate, endDate, addons } = req.body;
+    const { bundleName, date, startDate, endDate, addons, verificationSessionId } = req.body;
+
+    if (!verificationSessionId) {
+      return res.status(403).json({ 
+        error: 'Identity verification is required before proceeding to checkout.' 
+      });
+    }
+
+    const verificationSession = await stripe.identity.verificationSessions.retrieve(verificationSessionId);
+
+    if (verificationSession.status !== 'verified') {
+      let niceError = "Identity verification was not completed successfully.";
+      if (verificationSession.status === 'canceled') {
+        niceError = "Verification was canceled. We cannot proceed with your booking without verifying your identity.";
+      } else if (verificationSession.status === 'requires_input') {
+        niceError = "Verification is incomplete. Please submit the required documents.";
+      }
+      return res.status(403).json({ error: niceError });
+    }
 
     if (!bundleName || (!date && !startDate)) {
       return res.status(400).json({ error: 'Missing required fields: bundleName, date(s)' });
