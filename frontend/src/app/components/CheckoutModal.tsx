@@ -387,7 +387,7 @@ export function CheckoutModal({
 
                 <button
                   disabled={verificationStatus !== 'success'}
-                  onClick={() => onComplete(selectedAddons)}
+                  onClick={() => onComplete(selectedAddons, { firstName, lastName, email, phone })}
                   className={`w-full mt-6 py-4 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] ${
                     verificationStatus === 'success' 
                       ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400" 
