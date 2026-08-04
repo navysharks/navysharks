@@ -111,15 +111,18 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
       "Urban Discovery": 92000,
       "Total Immersion": 125000,
       "VIP Cultural Journey": 175000,
+      "Custom Experience": 0,
+      "Custom Quote / Enhanced Experience": 0,
     };
 
     const priceAmount = bundlePriceMap[bundleName];
-    if (!priceAmount) {
+    if (priceAmount === undefined) {
       return res.status(400).json({ error: `Unknown bundle: ${bundleName}` });
     }
 
-    const line_items = [
-      {
+    const line_items = [];
+    if (priceAmount > 0) {
+      line_items.push({
         price_data: {
           currency: 'usd',
           product_data: {
@@ -129,8 +132,8 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
           unit_amount: priceAmount,
         },
         quantity: 1,
-      },
-    ];
+      });
+    }
 
     const addonsMap = {
       helicopter: { name: "Helicopter Airport Transfer", price: 38000 },
@@ -172,6 +175,10 @@ router.post('/create-bundle-checkout-session', verifyToken, async (req, res) => 
           });
         }
       });
+    }
+
+    if (line_items.length === 0) {
+      return res.status(400).json({ error: "Your Custom Experience must include at least one selection." });
     }
 
     const session = await stripe.checkout.sessions.create({

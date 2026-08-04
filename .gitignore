@@ -12,3 +12,6 @@ pnpm-debug.log*
 .DS_Store
 credentials.csv
 serviceAccountKey.json
+
+.vercel
+.env*

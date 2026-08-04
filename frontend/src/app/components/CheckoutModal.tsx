@@ -73,7 +73,7 @@ export function CheckoutModal({
   };
 
   const handleNextAddons = () => {
-    onComplete(selectedAddons, { firstName, lastName, email, phone });
+    setStep("verification");
   };
 
   const handleStartVerification = async () => {
